@@ -1,0 +1,19 @@
+{
+  "name": "qarfash-api",
+  "version": "1.0.0",
+  "description": "Backend proxy API for Qarfash Anasheed (Firebase RTDB)",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.7.0",
+    "compression": "^1.7.4"
+  }
+}
