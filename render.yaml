@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: qarfash-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_INTEGRITY_HASH
+        value: 2ad9fc388b30f1314d07654cae91106981bcff7aa61448264e924666e47487bb
+      - key: FIREBASE_DB_URL
+        sync: false
+      - key: FIREBASE_DB_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dbcqz0yae
+      - key: CLOUDINARY_UPLOAD_PRESET
+        value: anasheed_unsigned
+      - key: RATE_LIMIT_IP
+        value: "120"
+      - key: RATE_LIMIT_DEVICE
+        value: "240"
+      - key: SELF_URL
+        value: https://my-backend-app-lte3.onrender.com
