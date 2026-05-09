@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: qarfash-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: HMAC_SECRET
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: APP_INTEGRITY_HASH
+        value: 2ad9fc388b30f1314d07654cae91106981bcff7aa61448264e924666e47487bb
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: FIREBASE_DB_URL
+        sync: false
+      - key: FIREBASE_DB_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_UPLOAD_PRESET
+        sync: false
+      - key: RATE_LIMIT_IP
+        value: "60"
+      - key: RATE_LIMIT_DEVICE
+        value: "120"
+      - key: SELF_URL
+        sync: false

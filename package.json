@@ -1,0 +1,20 @@
+{
+  "name": "qarfash-api",
+  "version": "2.0.0",
+  "description": "Secure backend API for Qarfash Anasheed app",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "compression": "^1.7.4",
+    "node-fetch": "^2.7.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
