@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>أثير — لوحة الأدمن</title>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#07070a;--surface:#15151c;--surface-2:#1d1d27;--surface-3:#262633;
+  --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
+  --text:#f5f5f7;--muted:#9a9aa6;--dim:#6b6b78;
+  --red:#ef2b3d;--red-2:#ff4757;--green:#22c55e;--amber:#f59e0b;
+  --grad:linear-gradient(135deg,#ef2b3d,#ff4757,#7a0610);
+  --shadow:0 20px 60px -20px rgba(239,43,61,.4);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Tajawal',system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(800px 500px at 80% -10%,rgba(239,43,61,.15),transparent 60%),radial-gradient(700px 600px at -10% 110%,rgba(122,6,16,.20),transparent 55%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:rgba(239,43,61,.3);border-radius:10px}
+
+#admin{position:relative;z-index:1;padding:calc(20px + var(--safe-top)) 16px calc(40px + var(--safe-bot));max-width:1100px;margin:0 auto}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.h-brand{font-family:'Amiri',serif;font-size:30px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.api-pill{font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:6px 10px;border-radius:50px}
+.api-pill .ok{color:var(--green)}.api-pill .bad{color:var(--red)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.stat .v{font-family:'Reem Kufi',sans-serif;font-size:24px;font-weight:700;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .l{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);padding:6px;border-radius:14px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:max-content;padding:10px 16px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-weight:700;font-size:13px;border-radius:10px;cursor:pointer;transition:.2s}
+.tab.active{background:var(--grad);color:#fff;box-shadow:var(--shadow)}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+.card h3{font-family:'Reem Kufi',sans-serif;font-size:17px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* Inputs */
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.row > *{flex:1;min-width:160px}
+label.field{display:block;margin-bottom:10px}
+label.field > span{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+input[type=text],input[type=number],input[type=url],input[type=search],textarea,select{
+  width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;
+  color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:.2s}
+input:focus,textarea:focus,select:focus{border-color:rgba(239,43,61,.5);background:var(--surface-3)}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+.checkbox{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--line);padding:8px 12px;border-radius:10px;cursor:pointer;font-size:13px}
+.checkbox input{accent-color:var(--red)}
+
+/* Buttons */
+.btn{padding:11px 18px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--text);border-radius:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-3);border-color:rgba(239,43,61,.4)}
+.btn.primary{background:var(--grad);border:none;box-shadow:var(--shadow);color:#fff}
+.btn.danger{background:rgba(239,43,61,.15);border-color:rgba(239,43,61,.4);color:var(--red-2)}
+.btn.tiny{padding:6px 10px;font-size:11px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Drop zone */
+.drop{border:2px dashed var(--line-2);border-radius:14px;padding:24px;text-align:center;cursor:pointer;transition:.2s;background:var(--surface-2)}
+.drop:hover,.drop.over{border-color:var(--red);background:rgba(239,43,61,.06)}
+.drop svg{width:36px;height:36px;color:var(--muted);margin-bottom:8px}
+.drop p{font-size:13px;color:var(--muted)}
+.drop p strong{color:var(--text)}
+
+/* Progress */
+.upload-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.up-item{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.up-item .nm{font-size:12px;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.up-bar{height:6px;background:var(--surface-3);border-radius:50px;overflow:hidden}
+.up-bar > div{height:100%;background:var(--grad);transition:width .2s}
+.up-item.done .up-bar > div{background:var(--green)}
+.up-item.err  .up-bar > div{background:var(--red)}
+
+/* Media chips */
+.media-chips{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.chip{display:flex;gap:10px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:8px;position:relative}
+.chip .thumb{width:64px;height:64px;border-radius:8px;background:#000;flex-shrink:0;display:grid;place-items:center;overflow:hidden}
+.chip .thumb img,.chip .thumb video{width:100%;height:100%;object-fit:cover}
+.chip .thumb svg{width:28px;height:28px;color:#fff}
+.chip .info{flex:1;min-width:0}
+.chip .info .t{font-size:12px;font-weight:700;text-transform:uppercase;color:var(--red-2);margin-bottom:2px}
+.chip .info .u{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:left}
+.chip .info input{margin-top:4px;font-size:12px;padding:6px 8px}
+.chip .acts{display:flex;flex-direction:column;gap:4px}
+.chip .acts button{padding:4px 8px;font-size:11px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;cursor:pointer}
+.chip .acts button:hover{color:var(--red-2);border-color:var(--red)}
+.chip.dragging{opacity:.5}
+
+/* Item list */
+.item-list{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center}
+.item .it-cover{width:54px;height:54px;border-radius:8px;background:#000;background-size:cover;background-position:center;flex-shrink:0}
+.item .it-info{flex:1;min-width:0}
+.item .it-info .ti{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .it-info .mt{font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+.item .mt .badge{background:var(--surface-3);padding:2px 8px;border-radius:50px}
+.item .mt .badge.pin{background:var(--grad);color:#fff}
+.item .mt .badge.hide{background:rgba(239,43,61,.2);color:var(--red-2)}
+.item .mt .badge.draft{background:rgba(245,158,11,.2);color:var(--amber)}
+.item .it-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* Toast */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface-3);border:1px solid var(--line-2);padding:12px 22px;border-radius:50px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.3s;z-index:500;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:linear-gradient(135deg,#ef2b3d,#7a0610)}
+#toast.ok{background:linear-gradient(135deg,#16a34a,#15803d)}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:400;padding:14px}
+.modal.show{display:flex}
+.modal .body{background:var(--surface);border:1px solid var(--line-2);border-radius:18px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:18px}
+
+/* Loading */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.view{display:none}.view.active{display:block}
+.muted{color:var(--muted);font-size:12px}
+
+@media (max-width:520px){
+  .item{flex-direction:column;align-items:stretch}
+  .item .it-acts{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div id="admin">
+
+  <div class="topbar">
+    <div class="h-brand">أثير · الأدمن</div>
+    <div class="api-pill">API: <span id="api-status" class="bad">●</span> <span id="api-url" style="direction:ltr"></span></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats"></div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-view="posts">📝 المنشورات</button>
+    <button class="tab" data-view="media">🎬 مكتبة الوسائط</button>
+    <button class="tab" data-view="menus">📑 القوائم الجانبية</button>
+    <button class="tab" data-view="sections">📂 الأقسام</button>
+    <button class="tab" data-view="anasheed">🎵 الأناشيد</button>
+    <button class="tab" data-view="config">⚙️ الإعدادات</button>
+  </div>
+
+  <!-- ==================== POSTS ==================== -->
+  <section class="view active" id="v-posts">
+    <div class="card">
+      <h3>✨ <span id="post-form-title">منشور جديد</span></h3>
+
+      <label class="field"><span>العنوان *</span><input type="text" id="p-title" maxlength="160" placeholder="عنوان المنشور"/></label>
+      <label class="field"><span>الوصف / النص</span><textarea id="p-body" maxlength="8000" placeholder="نص المنشور..."></textarea></label>
+
+      <div class="row">
+        <label class="field"><span>التصنيف</span><input type="text" id="p-cat" maxlength="40" placeholder="مثل: محاضرة، خواطر..."/></label>
+        <label class="field"><span>الوسوم (مفصولة بفاصلة)</span><input type="text" id="p-tags" placeholder="فيديو, إعلان"/></label>
+      </div>
+
+      <div class="row" style="margin-bottom:14px">
+        <label class="checkbox"><input type="checkbox" id="p-pinned"/> 📌 تثبيت</label>
+        <label class="checkbox"><input type="checkbox" id="p-featured"/> ⭐ مميّز</label>
+        <label class="checkbox"><input type="checkbox" id="p-hidden"/> 🚫 إخفاء</label>
+        <label class="checkbox"><input type="checkbox" id="p-draft"/> 📋 مسودة</label>
+      </div>
+
+      <label class="field"><span>صورة الغلاف (اختياري)</span><input type="url" id="p-cover" placeholder="رابط الغلاف"/></label>
+
+      <h3 style="margin-top:18px">🎬 الوسائط</h3>
+      <div class="drop" id="drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <p><strong>اسحب وأفلت</strong> الملفات هنا، أو <strong>اضغط لاختيارها</strong></p>
+        <p class="muted">فيديو · صور · PDF · صوت — بدون حد للحجم</p>
+        <input type="file" id="file-input" multiple accept="video/*,image/*,audio/*,.pdf" style="display:none"/>
+      </div>
+      <div class="upload-list" id="up-list"></div>
+
+      <div class="row" style="margin-top:8px">
+        <label class="field" style="flex:2"><span>أو ألصق رابطاً مباشراً</span>
+          <input type="url" id="p-url" placeholder="https://..."/></label>
+        <label class="field"><span>النوع</span>
+          <select id="p-utype">
+            <option value="">كشف تلقائي</option>
+            <option value="video">فيديو</option>
+            <option value="image">صورة</option>
+            <option value="audio">صوت</option>
+            <option value="pdf">PDF</option>
+          </select></label>
+      </div>
+      <button class="btn" id="p-url-add">➕ إضافة الرابط</button>
+
+      <div class="media-chips" id="media-chips"></div>
+
+      <div class="row" style="margin-top:18px">
+        <button class="btn primary" id="p-save">💾 حفظ المنشور</button>
+        <button class="btn" id="p-preview">👁 معاينة</button>
+        <button class="btn" id="p-reset">🔄 جديد</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 المنشورات الحالية</h3>
+      <div style="margin-bottom:10px"><input type="search" id="posts-search" placeholder="بحث..."/></div>
+      <div class="item-list" id="posts-list"></div>
+    </div>
+  </section>
+
+  <!-- ==================== MEDIA LIBRARY ==================== -->
+  <section class="view" id="v-media">
+    <div class="card">
+      <h3>🎬 مكتبة الوسائط</h3>
+      <p class="muted">جميع الوسائط المضافة عبر المنشورات.</p>
+      <div id="media-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTIONS ==================== -->
+  <section class="view" id="v-sections">
+    <div class="card">
+      <h3>📂 الأقسام</h3>
+      <label class="field"><span>اسم القسم</span><input type="text" id="s-name" maxlength="80"/></label>
+      <label class="field"><span>صورة القسم</span><input type="url" id="s-img"/></label>
+      <label class="field"><span>الوصف</span><textarea id="s-desc" maxlength="2000"></textarea></label>
+      <label class="field"><span>القائمة الجانبية الأم (اختياري)</span>
+        <select id="s-menu"><option value="">— بدون —</option></select></label>
+      <div class="row" style="margin-bottom:10px">
+        <label class="checkbox"><input type="checkbox" id="s-pinned"/> 📌 تثبيت في الرئيسية</label>
+        <label class="checkbox"><input type="checkbox" id="s-hidden"/> 🚫 إخفاء</label>
+      </div>
+      <h3 style="margin-top:14px">🎬 وسائط القسم</h3>
+      <div class="drop" id="s-drop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <p><strong>اسحب وأفلت</strong> أو <strong>اضغط لاختيار</strong> فيديو/صورة/PDF/صوت</p>
+        <input type="file" id="s-file-input" multiple accept="video/*,image/*,audio/*,.pdf" style="display:none"/>
+      </div>
+      <div class="upload-list" id="s-up-list"></div>
+      <div class="row" style="margin-top:8px">
+        <label class="field" style="flex:2"><span>أو ألصق رابطاً مباشراً</span>
+          <input type="url" id="s-url" placeholder="https://..."/></label>
+        <label class="field"><span>النوع</span>
+          <select id="s-utype">
+            <option value="">كشف تلقائي</option>
+            <option value="video">فيديو</option>
+            <option value="image">صورة</option>
+            <option value="audio">صوت</option>
+            <option value="pdf">PDF</option>
+          </select></label>
+      </div>
+      <button class="btn" id="s-url-add">➕ إضافة الرابط</button>
+      <div class="media-chips" id="s-media-chips"></div>
+      <button class="btn primary" id="s-save">💾 حفظ</button>
+      <button class="btn" id="s-reset">🔄 جديد</button>
+      <div class="item-list" id="sec-list" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== SIDE MENUS ==================== -->
+  <section class="view" id="v-menus">
+    <div class="card">
+      <h3>📑 <span id="menu-form-title">قائمة جانبية جديدة</span></h3>
+      <p class="muted">القوائم الجانبية تظهر للمستخدم عبر زر ☰. كل قائمة تفتح صفحة مستقلة فيها الأقسام والمحتوى.</p>
+      <label class="field"><span>اسم القائمة *</span><input type="text" id="m-label" maxlength="50" placeholder="مثل: القرآن الكريم، إذاعة البيان..."/></label>
+      <div class="row">
+        <label class="field"><span>أيقونة (إيموجي)</span><input type="text" id="m-icon" maxlength="30" placeholder="📖"/></label>
+        <label class="field"><span>الترتيب</span><input type="number" id="m-order" placeholder="0"/></label>
+      </div>
+      <label class="checkbox"><input type="checkbox" id="m-hidden"/> 🚫 إخفاء</label>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="m-save">💾 حفظ</button>
+        <button class="btn" id="m-reset">🔄 جديدة</button>
+      </div>
+      <div class="item-list" id="menus-list" style="margin-top:14px"></div>
+    </div>
+    <div class="card">
+      <h3>ℹ️ كيفية الاستخدام</h3>
+      <p class="muted">١) أنشئ قائمة جانبية هنا.<br/>٢) اذهب لتبويب 📂 الأقسام، أنشئ قسماً وحدّد "القائمة الأم" واربط به الوسائط.<br/>٣) المستخدم يفتح القائمة من زر ☰ فتظهر له صفحة فيها كل أقسام تلك القائمة ومحتواها.</p>
+    </div>
+  </section>
+
+  <!-- ==================== ANASHEED ==================== -->
+  <section class="view" id="v-anasheed">
+    <div class="card">
+      <h3>🎵 الأناشيد (ملفات صوتية فردية)</h3>
+      <label class="field"><span>العنوان *</span><input type="text" id="a-title" maxlength="120"/></label>
+      <label class="field"><span>المنشد</span><input type="text" id="a-artist" maxlength="80"/></label>
+      <label class="field"><span>رابط الصوت *</span><input type="url" id="a-url"/></label>
+      <label class="field"><span>صورة الغلاف</span><input type="url" id="a-cover"/></label>
+      <label class="field"><span>القسم (لإظهاره داخل قائمة جانبية)</span>
+        <select id="a-section"><option value="">— بدون قسم —</option></select>
+      </label>
+      <label class="checkbox" style="margin-top:6px"><input type="checkbox" id="a-bcast"/> تطبيق هذه الصورة كغلاف لـ <b>كل</b> الأناشيد عند الحفظ</label>
+      <div class="row" style="margin-top:6px">
+        <button class="btn" id="a-bcast-now" type="button">🖼️ تطبيق على كل الأناشيد (عام)</button>
+        <button class="btn" id="a-bcast-sec" type="button">🎯 تطبيق على أناشيد القسم المحدد فقط</button>
+      </div>
+      <button class="btn primary" id="a-save">💾 حفظ</button>
+      <div class="item-list" id="an-list" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ==================== CONFIG ==================== -->
+  <section class="view" id="v-config">
+    <div class="card">
+      <h3>⚙️ إعدادات التطبيق</h3>
+      <div class="row">
+        <label class="field"><span>اسم التطبيق</span><input type="text" id="c-app" maxlength="60"/></label>
+        <label class="field"><span>اسم العلامة</span><input type="text" id="c-brand" maxlength="60"/></label>
+      </div>
+      <label class="field"><span>عنوان الصفحة الرئيسية</span><input type="text" id="c-htitle" maxlength="80"/></label>
+      <label class="field"><span>وصف فرعي</span><input type="text" id="c-hsub" maxlength="140"/></label>
+      <h3 style="margin-top:18px">👤 معلومات المالك</h3>
+      <label class="field"><span>الاسم</span><input type="text" id="c-name" maxlength="80"/></label>
+      <label class="field"><span>الصورة</span><input type="url" id="c-photo"/></label>
+      <label class="field"><span>نبذة</span><textarea id="c-bio" maxlength="1000"></textarea></label>
+      <h4 style="margin-top:12px;color:var(--muted);font-size:13px">🎥 فيديو تعريفي (اختياري)</h4>
+      <label class="field"><span>رابط الفيديو</span><input type="url" id="c-intro-video" placeholder="https://..."/></label>
+      <label class="field"><span>صورة غلاف الفيديو</span><input type="url" id="c-intro-poster" placeholder="https://..."/></label>
+      <div class="row">
+        <label class="field"><span>تلجرام</span><input type="url" id="c-tg"/></label>
+        <label class="field"><span>يوتيوب</span><input type="url" id="c-yt"/></label>
+      </div>
+      <div class="row">
+        <label class="field"><span>فيسبوك</span><input type="url" id="c-fb"/></label>
+        <label class="field"><span>انستجرام</span><input type="url" id="c-ig"/></label>
+      </div>
+      <div class="row">
+        <label class="field"><span>TikTok</span><input type="url" id="c-tt"/></label>
+        <label class="field"><span>X / Twitter</span><input type="url" id="c-x"/></label>
+      </div>
+      <label class="field"><span>WhatsApp</span><input type="url" id="c-wa"/></label>
+      <label class="field"><span>الموقع</span><input type="url" id="c-web"/></label>
+      <h3 style="margin-top:18px">🎨 ألوان التطبيق</h3>
+      <div class="row">
+        <label class="field"><span>اللون الأساسي</span><input type="color" id="c-th-primary" value="#ef2b3d"/></label>
+        <label class="field"><span>اللون الثانوي</span><input type="color" id="c-th-primary2" value="#ff4757"/></label>
+        <label class="field"><span>اللون العميق</span><input type="color" id="c-th-primarydeep" value="#7a0610"/></label>
+      </div>
+      <div class="row">
+        <label class="field"><span>الخلفية</span><input type="color" id="c-th-bg" value="#07070a"/></label>
+        <label class="field"><span>السطح</span><input type="color" id="c-th-surface" value="#15151c"/></label>
+        <label class="field"><span>النص</span><input type="color" id="c-th-text" value="#f5f5f7"/></label>
+      </div>
+      <div class="row">
+        <label class="field"><span>زر الصوت — لون 1</span><input type="color" id="c-th-audio" value="#22c55e"/></label>
+        <label class="field"><span>زر الصوت — لون 2</span><input type="color" id="c-th-audio2" value="#15803d"/></label>
+      </div>
+      <button class="btn primary" id="c-save">💾 حفظ الإعدادات</button>
+    </div>
+    <div class="card">
+      <h3>📡 حالة التطبيق</h3>
+      <label class="checkbox"><input type="checkbox" id="st-dis"/> تعطيل التطبيق</label>
+      <label class="field" style="margin-top:10px"><span>رسالة الصيانة</span><textarea id="st-msg" maxlength="300"></textarea></label>
+      <div class="row">
+        <label class="field"><span>الإصدار</span><input type="text" id="st-ver" maxlength="20"/></label>
+        <label class="field"><span>رابط التحديث</span><input type="url" id="st-url"/></label>
+      </div>
+      <button class="btn primary" id="st-save">💾 حفظ الحالة</button>
+    </div>
+  </section>
+</div>
+
+<!-- Preview modal -->
+<div class="modal" id="preview-modal"><div class="body" id="preview-body"></div></div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   أثير — Admin v3.0
+   ============================================================ */
+ const API = (window.__API__ || location.origin).replace(/\/+$/,'');
+
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc= s => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtBytes = n => { if(!n) return ''; const u=['B','KB','MB','GB']; let i=0; while(n>=1024 && i<3){n/=1024;i++;} return n.toFixed(1)+u[i]; };
+
+function toast(msg, kind){
+  const t = $('#toast'); if (!t) return;
+  t.textContent = msg;
+  t.className = 'show ' + (kind==='err'?'err':kind==='ok'?'ok':'');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.className='', 2500);
+}
+
+/* ===== JWT + CSRF auth bootstrap ===== */
+function getAccess(){ return sessionStorage.getItem('admin_access') || ''; }
+function setAccess(t){ if (t) sessionStorage.setItem('admin_access', t); else sessionStorage.removeItem('admin_access'); }
+function getCsrf(){ return sessionStorage.getItem('admin_csrf') || ''; }
+function setCsrf(t){ if (t) sessionStorage.setItem('admin_csrf', t); }
+
+async function bootstrapCsrf(){
+  try {
+    const r = await fetch(API+'/api/csrf', { credentials:'include', cache:'no-store' });
+    const j = await r.json(); if (j && j.csrfToken) setCsrf(j.csrfToken);
+  } catch {}
+}
+async function tryRefresh(){
+  try {
+    const r = await fetch(API+'/api/admin/auth/refresh', {
+      method:'POST', credentials:'include', headers:{ 'X-CSRF-Token': getCsrf() },
+    });
+    if (!r.ok) return false;
+    const j = await r.json();
+    if (j && j.accessToken){ setAccess(j.accessToken); return true; }
+    return false;
+  } catch { return false; }
+}
+function goLogin(){ setAccess(''); location.replace('/admin-login.html'); }
+if (!getAccess()) { goLogin(); }
+
+async function api(path, opts={}){
+  const method = opts.method || 'GET';
+  const headers = {};
+  if (opts.body) headers['content-type'] = 'application/json';
+  const token = getAccess(); if (token) headers['authorization'] = 'Bearer ' + token;
+  if (method !== 'GET' && method !== 'HEAD') headers['x-csrf-token'] = getCsrf();
+  const doFetch = () => fetch(API+path, {
+    method, headers, credentials:'include',
+    body: opts.body ? JSON.stringify(opts.body) : undefined, cache:'no-store',
+  });
+  let r = await doFetch();
+  if (r.status === 401) {
+    const ok = await tryRefresh();
+    if (!ok) { goLogin(); throw new Error('401'); }
+    headers['authorization'] = 'Bearer ' + getAccess();
+    r = await doFetch();
+    if (r.status === 401) { goLogin(); throw new Error('401'); }
+  }
+  if (r.status === 403) {
+    await bootstrapCsrf(); headers['x-csrf-token'] = getCsrf();
+    r = await doFetch();
+  }
+  if (!r.ok) {
+    let err = ''; try { err = (await r.json()).error||''; } catch{}
+    throw new Error(`${r.status} ${err}`);
+  }
+  return r.json();
+}
+
+/* ===== Health + session verification ===== */
+(async () => {
+  await bootstrapCsrf();
+  try { await api('/api/admin/auth/me'); } catch { goLogin(); return; }
+  const apiUrlEl = $('#api-url'); if (apiUrlEl) apiUrlEl.textContent = API.replace(/^https?:\/\//,'');
+  fetch(API+'/healthz').then(r=>r.json())
+    .then(()=>{ const s=$('#api-status'); if (s){ s.className='ok'; s.textContent='● متصل'; } })
+    .catch(()=>{ const s=$('#api-status'); if (s) s.textContent='● منقطع'; });
+})();
+
+/* ===== Tabs ===== */
+$$('.tab').forEach(t => t.addEventListener('click', () => {
+  $$('.tab').forEach(x=>x.classList.remove('active'));
+  $$('.view').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  $('#v-'+t.dataset.view).classList.add('active');
+  if (t.dataset.view==='posts')    loadPosts();
+  if (t.dataset.view==='media')    renderMediaLib();
+  if (t.dataset.view==='sections') loadSections();
+  if (t.dataset.view==='menus')    loadMenus();
+  if (t.dataset.view==='anasheed') loadAnasheed();
+  if (t.dataset.view==='config')   loadConfig();
+}));
+
+/* ===== Stats ===== */
+async function loadStats(){
+  try {
+    const s = await api('/api/admin/stats');
+    const cards = [
+      ['📝', s.posts, 'منشور'],
+      ['📌', s.postsPinned, 'مثبّت'],
+      ['🎬', s.mediaCounts?.video||0, 'فيديو'],
+      ['🖼', s.mediaCounts?.image||0, 'صورة'],
+      ['📄', s.mediaCounts?.pdf||0, 'PDF'],
+      ['🎵', s.mediaCounts?.audio||0, 'صوت'],
+      ['👁', s.totalViews, 'مشاهدة'],
+      ['📂', s.sections, 'قسم'],
+    ];
+    $('#stats').innerHTML = cards.map(([i,v,l])=>`<div class="stat"><div class="v">${i} ${v||0}</div><div class="l">${l}</div></div>`).join('');
+  } catch {}
+}
+
+/* ============================================================
+   MEDIA UPLOAD (Cloudinary unsigned)
+   ============================================================ */
+function detectKind(file){
+  const m = file.type || '';
+  if (m.startsWith('video/')) return 'video';
+  if (m.startsWith('image/')) return 'image';
+  if (m.startsWith('audio/')) return 'audio';
+  if (m === 'application/pdf' || /\.pdf$/i.test(file.name)) return 'pdf';
+  return 'text';
+}
+// Signed Cloudinary upload — the server signs each upload; the browser never
+// sees the API secret and cannot tamper with folder/resource_type.
+async function uploadFile(file, onProgress){
+  const kind = detectKind(file);
+  const resource_type = (kind === 'image') ? 'image'
+                      : (kind === 'video' || kind === 'audio') ? 'video'
+                      : 'raw';
+  const folder = (kind === 'image') ? 'covers' : 'media';
+  const sig = await api('/api/admin/cloudinary/sign', {
+    method:'POST', body:{ folder, resource_type },
+  });
+  const url = `https://api.cloudinary.com/v1_1/${sig.cloudName}/${resource_type}/upload`;
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('api_key',         sig.apiKey);
+    fd.append('timestamp',       sig.timestamp);
+    fd.append('signature',       sig.signature);
+    fd.append('folder',          sig.folder);
+    fd.append('use_filename',    sig.use_filename);
+    fd.append('unique_filename', sig.unique_filename);
+    fd.append('overwrite',       sig.overwrite);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100)); };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const j = JSON.parse(xhr.responseText);
+        resolve({ url:j.secure_url, kind, width:j.width||0, height:j.height||0,
+                  duration:j.duration||0, size:j.bytes||file.size,
+                  mime:file.type, name:file.name });
+      } else reject(new Error('upload failed '+xhr.status));
+    };
+    xhr.onerror = () => reject(new Error('network'));
+    xhr.send(fd);
+  });
+}
+
+/* ============================================================
+   POST FORM — Media chips
+   ============================================================ */
+let editingId = null;
+const mediaList = []; // {type,url,caption,poster,width,height,duration,size}
+
+function renderChips(){
+  const c = $('#media-chips');
+  if (!mediaList.length) { c.innerHTML='<p class="muted" style="text-align:center;padding:10px">لا توجد وسائط بعد</p>'; return; }
+  c.innerHTML = mediaList.map((m,i) => {
+    const thumb = m.type==='image' ? `<img src="${esc(m.url)}">` :
+                  m.type==='video' ? `<video src="${esc(m.url)}#t=1" muted playsinline></video>` :
+                  m.type==='audio' ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>` :
+                  m.type==='pdf'   ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>` :
+                  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>`;
+    return `<div class="chip" draggable="true" data-i="${i}">
+      <div class="thumb">${thumb}</div>
+      <div class="info">
+        <div class="t">${m.type.toUpperCase()} ${m.size?`· ${fmtBytes(m.size)}`:''} ${m.duration?`· ${Math.round(m.duration)}ث`:''}</div>
+        <div class="u">${esc(m.url)}</div>
+        <input type="text" placeholder="وصف (اختياري)" value="${esc(m.caption||'')}" data-cap="${i}"/>
+      </div>
+      <div class="acts">
+        <button data-up="${i}" ${i===0?'disabled':''}>▲</button>
+        <button data-dn="${i}" ${i===mediaList.length-1?'disabled':''}>▼</button>
+        <button data-rm="${i}">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+$('#media-chips').addEventListener('click', e => {
+  const up = e.target.closest('[data-up]'); const dn = e.target.closest('[data-dn]'); const rm = e.target.closest('[data-rm]');
+  if (up) { const i=+up.dataset.up; [mediaList[i-1],mediaList[i]]=[mediaList[i],mediaList[i-1]]; renderChips(); }
+  else if (dn) { const i=+dn.dataset.dn; [mediaList[i+1],mediaList[i]]=[mediaList[i],mediaList[i+1]]; renderChips(); }
+  else if (rm) { mediaList.splice(+rm.dataset.rm,1); renderChips(); }
+});
+$('#media-chips').addEventListener('input', e => {
+  const cap = e.target.closest('[data-cap]'); if (!cap) return;
+  mediaList[+cap.dataset.cap].caption = cap.value;
+});
+// Drag reorder
+let dragI = null;
+$('#media-chips').addEventListener('dragstart', e => { const ch=e.target.closest('.chip'); if(!ch) return; dragI=+ch.dataset.i; ch.classList.add('dragging'); });
+$('#media-chips').addEventListener('dragend',   e => { const ch=e.target.closest('.chip'); if(ch) ch.classList.remove('dragging'); });
+$('#media-chips').addEventListener('dragover',  e => { e.preventDefault(); });
+$('#media-chips').addEventListener('drop', e => {
+  e.preventDefault();
+  const ch = e.target.closest('.chip'); if (!ch || dragI===null) return;
+  const to = +ch.dataset.i; if (to===dragI) return;
+  const [m] = mediaList.splice(dragI,1); mediaList.splice(to,0,m);
+  dragI = null; renderChips();
+});
+
+/* ===== Drop zone ===== */
+const drop = $('#drop'); const fileInput = $('#file-input');
+drop.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+drop.addEventListener('dragover',  e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); handleFiles(e.dataTransfer.files); });
+
+async function handleFiles(files){
+  const upList = $('#up-list');
+  for (const file of Array.from(files)) {
+    // Size limit removed by request — large files (long videos, big PDFs)
+    // go straight to Cloudinary; the backend never sees the bytes.
+    const row = document.createElement('div'); row.className = 'up-item';
+    row.innerHTML = `<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
+    upList.appendChild(row);
+    const bar = row.querySelector('.up-bar > div');
+    try {
+      const res = await uploadFile(file, p => bar.style.width = p+'%');
+      bar.style.width='100%'; row.classList.add('done');
+      mediaList.push({ type:res.kind, url:res.url, caption:'', width:res.width, height:res.height, duration:res.duration, size:res.size, mime:res.mime });
+      renderChips();
+      setTimeout(()=>row.remove(), 1500);
+    } catch(e) {
+      row.classList.add('err'); bar.style.width='100%';
+      toast('فشل رفع '+file.name, 'err');
+    }
+  }
+}
+
+$('#p-url-add').addEventListener('click', () => {
+  const url = $('#p-url').value.trim();
+  if (!url) return;
+  const t = $('#p-utype').value || detectByExt(url);
+  mediaList.push({ type:t, url, caption:'' });
+  $('#p-url').value=''; $('#p-utype').value=''; renderChips();
+});
+function detectByExt(u){
+  try { const ext=new URL(u).pathname.toLowerCase().split('.').pop();
+    if (['mp4','mov','m4v','webm','mkv','m3u8','ogv'].includes(ext)) return 'video';
+    if (['mp3','m4a','aac','ogg','wav','opus'].includes(ext)) return 'audio';
+    if (['jpg','jpeg','png','webp','gif','avif'].includes(ext)) return 'image';
+    if (ext==='pdf') return 'pdf';
+  } catch{}
+  return 'text';
+}
+
+/* ===== Save/Edit/Reset Post ===== */
+function readPostForm(){
+  return {
+    title:    $('#p-title').value.trim(),
+    body:     $('#p-body').value,
+    coverUrl: $('#p-cover').value.trim(),
+    category: $('#p-cat').value.trim(),
+    tags:     $('#p-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    pinned:   $('#p-pinned').checked,
+    featured: $('#p-featured').checked,
+    hidden:   $('#p-hidden').checked,
+    draft:    $('#p-draft').checked,
+    media:    mediaList.slice(),
+  };
+}
+function resetForm(){
+  editingId = null;
+  $('#post-form-title').textContent = 'منشور جديد';
+  ['p-title','p-body','p-cover','p-cat','p-tags','p-url'].forEach(id => $('#'+id).value='');
+  ['p-pinned','p-featured','p-hidden','p-draft'].forEach(id => $('#'+id).checked=false);
+  mediaList.length = 0; renderChips();
+}
+$('#p-reset').addEventListener('click', resetForm);
+
+$('#p-save').addEventListener('click', async () => {
+  const data = readPostForm();
+  if (!data.title) return toast('العنوان مطلوب', 'err');
+  $('#p-save').disabled = true;
+  try {
+    if (editingId) await api('/api/admin/posts/'+encodeURIComponent(editingId), { method:'PUT', body:data });
+    else           await api('/api/admin/posts', { method:'POST', body:data });
+    toast(editingId?'تم التحديث':'تم النشر', 'ok');
+    resetForm(); loadPosts(); loadStats();
+  } catch(e) { toast('فشل الحفظ: '+e.message, 'err'); }
+  finally { $('#p-save').disabled = false; }
+});
+
+$('#p-preview').addEventListener('click', () => {
+  const d = readPostForm();
+  const body = $('#preview-body');
+  body.innerHTML = `
+    <h3 style="font-family:'Reem Kufi',sans-serif;font-size:20px;margin-bottom:10px">${esc(d.title||'(بدون عنوان)')}</h3>
+    <div style="color:var(--muted);white-space:pre-wrap;font-size:14px;line-height:1.7">${esc(d.body)}</div>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+    ${d.media.map(m => {
+      if (m.type==='image') return `<img src="${esc(m.url)}" style="width:100%;border-radius:10px">`;
+      if (m.type==='video') return `<video src="${esc(m.url)}" controls style="width:100%;border-radius:10px;background:#000"></video>`;
+      if (m.type==='audio') return `<audio src="${esc(m.url)}" controls style="width:100%"></audio>`;
+      if (m.type==='pdf')   return `<iframe src="${esc(m.url)}" style="width:100%;height:400px;border:1px solid var(--line);border-radius:10px"></iframe>`;
+      return `<div style="padding:10px;background:var(--surface-2);border-radius:10px">${esc(m.text||m.url||'')}</div>`;
+    }).join('')}
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="document.getElementById('preview-modal').classList.remove('show')">إغلاق</button>
+    </div>`;
+  $('#preview-modal').classList.add('show');
+});
+$('#preview-modal').addEventListener('click', e => { if (e.target.id==='preview-modal') e.currentTarget.classList.remove('show'); });
+
+/* ===== Posts list ===== */
+let allPosts = [];
+async function loadPosts(){
+  try {
+    const { items } = await api('/api/admin/posts');
+    allPosts = items || [];
+    renderPostList();
+  } catch(e) { toast('تعذر التحميل', 'err'); }
+}
+function renderPostList(){
+  const q = $('#posts-search').value.trim().toLowerCase();
+  const list = q ? allPosts.filter(p => (p.title||'').toLowerCase().includes(q) || (p.tags||[]).some(t=>String(t).toLowerCase().includes(q))) : allPosts;
+  const c = $('#posts-list');
+  if (!list.length) { c.innerHTML = '<p class="muted" style="text-align:center;padding:20px">لا توجد منشورات</p>'; return; }
+  c.innerHTML = list.map(p => {
+    const cnt = (p.media||[]).reduce((a,m)=>{ a[m.type]=(a[m.type]||0)+1; return a; }, {});
+    const mediaStr = Object.entries(cnt).map(([t,n])=>`${({video:'🎬',image:'🖼',pdf:'📄',audio:'🎵',text:'📝'})[t]||'•'} ${n}`).join(' · ');
+    const cover = p.coverUrl || (p.media||[]).find(m=>m.type==='image')?.url || '';
+    return `<div class="item">
+      <div class="it-cover" style="${cover?`background-image:url('${esc(cover)}')`:''}"></div>
+      <div class="it-info">
+        <div class="ti">${esc(p.title)}</div>
+        <div class="mt">
+          ${p.pinned?'<span class="badge pin">📌 مثبّت</span>':''}
+          ${p.hidden?'<span class="badge hide">🚫 مخفي</span>':''}
+          ${p.draft?'<span class="badge draft">📋 مسودة</span>':''}
+          ${p.featured?'<span class="badge">⭐</span>':''}
+          <span class="badge">${mediaStr || 'نص فقط'}</span>
+          <span class="badge">👁 ${p.views||0}</span>
+        </div>
+      </div>
+      <div class="it-acts">
+        <button class="btn tiny" data-edit="${p.id}">✏️ تعديل</button>
+        <button class="btn tiny" data-pin="${p.id}">${p.pinned?'إلغاء التثبيت':'تثبيت'}</button>
+        <button class="btn tiny" data-hide="${p.id}">${p.hidden?'إظهار':'إخفاء'}</button>
+        <button class="btn tiny danger" data-del="${p.id}">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+$('#posts-search').addEventListener('input', renderPostList);
+$('#posts-list').addEventListener('click', async e => {
+  const ed=e.target.closest('[data-edit]'),pi=e.target.closest('[data-pin]'),hi=e.target.closest('[data-hide]'),de=e.target.closest('[data-del]');
+  if (ed) {
+    const p = allPosts.find(x=>x.id===ed.dataset.edit); if (!p) return;
+    editingId = p.id; $('#post-form-title').textContent = 'تعديل: '+p.title;
+    $('#p-title').value = p.title||''; $('#p-body').value=p.body||''; $('#p-cover').value=p.coverUrl||'';
+    $('#p-cat').value=p.category||''; $('#p-tags').value=(p.tags||[]).join(', ');
+    $('#p-pinned').checked=!!p.pinned; $('#p-featured').checked=!!p.featured; $('#p-hidden').checked=!!p.hidden; $('#p-draft').checked=!!p.draft;
+    mediaList.length=0; (p.media||[]).forEach(m=>mediaList.push({...m})); renderChips();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  if (pi) { const p=allPosts.find(x=>x.id===pi.dataset.pin); await api('/api/admin/posts/'+encodeURIComponent(p.id),{method:'PUT',body:{pinned:!p.pinned}}); loadPosts(); toast('تم'); }
+  if (hi) { const p=allPosts.find(x=>x.id===hi.dataset.hide); await api('/api/admin/posts/'+encodeURIComponent(p.id),{method:'PUT',body:{hidden:!p.hidden}}); loadPosts(); toast('تم'); }
+  if (de) {
+    if (!confirm('حذف هذا المنشور؟')) return;
+    await api('/api/admin/posts/'+encodeURIComponent(de.dataset.del),{method:'DELETE'});
+    loadPosts(); loadStats(); toast('تم الحذف','ok');
+  }
+});
+
+/* ============================================================
+   MEDIA LIBRARY
+   ============================================================ */
+function renderMediaLib(){
+  const all = [];
+  allPosts.forEach(p => (p.media||[]).forEach(m => all.push({...m, _post:p})));
+  const grid = $('#media-grid');
+  if (!all.length) { grid.innerHTML = '<p class="muted">لا توجد وسائط</p>'; return; }
+  grid.innerHTML = all.map(m => {
+    const ico = ({video:'🎬',image:'🖼',pdf:'📄',audio:'🎵'})[m.type]||'📁';
+    const bg = m.type==='image' ? m.url : (m.poster||m.thumb||m._post.coverUrl||'');
+    return `<a href="${esc(m.url)}" target="_blank" rel="noopener" style="aspect-ratio:1;background:#000 ${bg?`url('${esc(bg)}')`:''} center/cover;border-radius:10px;display:grid;place-items:end;padding:8px;text-decoration:none;color:#fff;font-size:12px;text-shadow:0 1px 2px #000">${ico} ${m.type}</a>`;
+  }).join('');
+}
+
+/* ============================================================
+   SECTIONS / ANASHEED / CONFIG
+   ============================================================ */
+let editSecId = null;
+const sMediaList = [];
+function renderSChips(){
+  const c = $('#s-media-chips'); if(!c) return;
+  if (!sMediaList.length){ c.innerHTML='<p class="muted" style="text-align:center;padding:10px">لا توجد وسائط</p>'; return; }
+  c.innerHTML = sMediaList.map((m,i)=>{
+    const ic = ({video:'🎬',image:'🖼',audio:'🎵',pdf:'📄'})[m.type]||'📁';
+    return `<div class="chip"><div class="thumb">${m.type==='image'?`<img src="${esc(m.url)}">`:`<span style="font-size:24px">${ic}</span>`}</div>
+      <div class="info"><div class="t">${esc(m.type.toUpperCase())}</div><div class="u">${esc(m.url)}</div>
+      <input type="text" placeholder="وصف" value="${esc(m.caption||'')}" data-scap="${i}"/></div>
+      <div class="acts"><button data-sup="${i}" ${i===0?'disabled':''}>▲</button><button data-sdn="${i}" ${i===sMediaList.length-1?'disabled':''}>▼</button><button data-srm="${i}">✕</button></div></div>`;
+  }).join('');
+}
+document.addEventListener('click', e=>{
+  const up=e.target.closest('[data-sup]'),dn=e.target.closest('[data-sdn]'),rm=e.target.closest('[data-srm]');
+  if(up){const i=+up.dataset.sup;[sMediaList[i-1],sMediaList[i]]=[sMediaList[i],sMediaList[i-1]];renderSChips();}
+  else if(dn){const i=+dn.dataset.sdn;[sMediaList[i+1],sMediaList[i]]=[sMediaList[i],sMediaList[i+1]];renderSChips();}
+  else if(rm){sMediaList.splice(+rm.dataset.srm,1);renderSChips();}
+});
+document.addEventListener('input', e=>{ const c=e.target.closest('[data-scap]'); if(c) sMediaList[+c.dataset.scap].caption=c.value; });
+
+(()=>{
+  const drop=$('#s-drop'),fi=$('#s-file-input'); if(!drop) return;
+  drop.addEventListener('click',()=>fi.click());
+  fi.addEventListener('change',e=>sHandleFiles(e.target.files));
+  drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over');});
+  drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+  drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');sHandleFiles(e.dataTransfer.files);});
+})();
+async function sHandleFiles(files){
+  const list=$('#s-up-list');
+  for(const file of Array.from(files)){
+    // Size limit removed by request.
+    const row=document.createElement('div');row.className='up-item';
+    row.innerHTML=`<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
+    list.appendChild(row);const bar=row.querySelector('.up-bar > div');
+    try{ const res=await uploadFile(file,p=>bar.style.width=p+'%');
+      sMediaList.push({type:res.kind,url:res.url,caption:'',width:res.width,height:res.height,duration:res.duration,size:res.size,mime:res.mime});
+      bar.style.width='100%';row.classList.add('done');renderSChips();setTimeout(()=>row.remove(),1500);
+    }catch{row.classList.add('err');toast('فشل رفع '+file.name,'err');}
+  }
+}
+$('#s-url-add')?.addEventListener('click',()=>{
+  const u=$('#s-url').value.trim(); if(!u) return;
+  sMediaList.push({type:$('#s-utype').value||detectByExt(u),url:u,caption:''});
+  $('#s-url').value='';$('#s-utype').value='';renderSChips();
+});
+function resetSecForm(){
+  editSecId=null; ['s-name','s-img','s-desc'].forEach(id=>$('#'+id).value=''); $('#s-menu').value=''; $('#s-pinned').checked=false; $('#s-hidden').checked=false; sMediaList.length=0; renderSChips();
+}
+$('#s-reset')?.addEventListener('click', resetSecForm);
+$('#s-save').addEventListener('click', async () => {
+  const body = { name:$('#s-name').value.trim(), imageUrl:$('#s-img').value.trim(), description:$('#s-desc').value, menuId:$('#s-menu').value||null, pinned:$('#s-pinned').checked, hidden:$('#s-hidden').checked, media:sMediaList.slice() };
+  if (!body.name) return toast('الاسم مطلوب','err');
+  try {
+    if (editSecId) await api('/api/admin/sections/'+encodeURIComponent(editSecId),{method:'PUT',body});
+    else            await api('/api/admin/sections',{method:'POST',body});
+    resetSecForm(); loadSections(); toast('تم','ok');
+  } catch(e){ toast('فشل: '+e.message,'err'); }
+});
+
+async function refreshMenuSelect(){
+  try{ const {items}=await api('/api/admin/side-menu');
+    const sel=$('#s-menu'); if(!sel) return;
+    sel.innerHTML='<option value="">— بدون —</option>'+items.map(m=>`<option value="${esc(m.id)}">${esc(m.label||'')}</option>`).join('');
+  }catch{}
+}
+async function loadSections(){
+  try {
+    await refreshMenuSelect();
+    const { items } = await api('/api/admin/sections');
+    $('#sec-list').innerHTML = items.map(s => `
+      <div class="item">
+        <div class="it-cover" style="${s.imageUrl?`background-image:url('${esc(s.imageUrl)}')`:''}"></div>
+        <div class="it-info"><div class="ti">${esc(s.name)}</div><div class="mt">${s.pinned?'<span class="badge pin">📌 مثبّت</span>':''}<span class="badge">${s.hidden?'مخفي':'ظاهر'}</span>${s.menuId?`<span class="badge">📑 مرتبط</span>`:''}<span class="badge">${(s.media||[]).length} وسائط</span></div></div>
+        <div class="it-acts">
+          <button class="btn tiny" data-sec-ed="${s.id}">✏️</button>
+          <button class="btn tiny danger" data-sec-del="${s.id}">🗑</button>
+        </div></div>`).join('');
+    $('#sec-list').onclick = async e => {
+      const ed=e.target.closest('[data-sec-ed]'), de=e.target.closest('[data-sec-del]');
+      if (ed) {
+        const s=items.find(x=>x.id===ed.dataset.secEd); editSecId=s.id;
+        $('#s-name').value=s.name||''; $('#s-img').value=s.imageUrl||''; $('#s-desc').value=s.description||'';
+        $('#s-menu').value=s.menuId||'';
+        $('#s-pinned').checked=!!s.pinned; $('#s-hidden').checked=!!s.hidden;
+        sMediaList.length=0; (s.media||[]).forEach(m=>sMediaList.push({...m})); renderSChips();
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+      if (de) { if (!confirm('حذف؟')) return; await api('/api/admin/sections/'+encodeURIComponent(de.dataset.secDel),{method:'DELETE'}); loadSections(); }
+    };
+  } catch{}
+}
+
+/* ===== Side menus CRUD ===== */
+let editMenuId=null;
+function resetMenuForm(){ editMenuId=null; ['m-label','m-icon','m-order'].forEach(id=>$('#'+id).value=''); $('#m-hidden').checked=false; $('#menu-form-title').textContent='قائمة جانبية جديدة'; }
+$('#m-reset')?.addEventListener('click', resetMenuForm);
+$('#m-save')?.addEventListener('click', async ()=>{
+  const body={ label:$('#m-label').value.trim(), icon:$('#m-icon').value.trim(), order:Number($('#m-order').value)||0, hidden:$('#m-hidden').checked };
+  if(!body.label) return toast('الاسم مطلوب','err');
+  try{
+    if(editMenuId) await api('/api/admin/side-menu/'+encodeURIComponent(editMenuId),{method:'PUT',body});
+    else           await api('/api/admin/side-menu',{method:'POST',body});
+    resetMenuForm(); loadMenus(); toast('تم','ok');
+  }catch(e){ toast('فشل: '+e.message,'err'); }
+});
+async function loadMenus(){
+  try{
+    const { items } = await api('/api/admin/side-menu');
+    $('#menus-list').innerHTML = items.map(m=>`
+      <div class="item">
+        <div class="it-cover" style="background:linear-gradient(135deg,#fafafa,#c3c3cb);color:#0c0c12;display:grid;place-items:center;font-size:22px;font-weight:900">${esc(m.icon||'☰')}</div>
+        <div class="it-info"><div class="ti">${esc(m.label||'')}</div><div class="mt"><span class="badge">${m.hidden?'مخفية':'ظاهرة'}</span><span class="badge">ترتيب ${m.order||0}</span></div></div>
+        <div class="it-acts">
+          <button class="btn tiny" data-mn-ed="${m.id}">✏️</button>
+          <button class="btn tiny" data-mn-hide="${m.id}">${m.hidden?'إظهار':'إخفاء'}</button>
+          <button class="btn tiny danger" data-mn-del="${m.id}">🗑</button>
+        </div></div>`).join('') || '<p class="muted" style="text-align:center;padding:20px">لا توجد قوائم بعد</p>';
+    $('#menus-list').onclick = async e=>{
+      const ed=e.target.closest('[data-mn-ed]'), hi=e.target.closest('[data-mn-hide]'), de=e.target.closest('[data-mn-del]');
+      if(ed){ const m=items.find(x=>x.id===ed.dataset.mnEd); editMenuId=m.id; $('#m-label').value=m.label||''; $('#m-icon').value=m.icon||''; $('#m-order').value=m.order||0; $('#m-hidden').checked=!!m.hidden; $('#menu-form-title').textContent='تعديل: '+m.label; window.scrollTo({top:0,behavior:'smooth'}); }
+      if(hi){ const m=items.find(x=>x.id===hi.dataset.mnHide); await api('/api/admin/side-menu/'+encodeURIComponent(m.id),{method:'PUT',body:{hidden:!m.hidden}}); loadMenus(); }
+      if(de){ if(!confirm('حذف هذه القائمة؟')) return; await api('/api/admin/side-menu/'+encodeURIComponent(de.dataset.mnDel),{method:'DELETE'}); loadMenus(); toast('تم الحذف','ok'); }
+    };
+  }catch{}
+}
+
+let editAnId = null;
+$('#a-save').addEventListener('click', async () => {
+  const cover = $('#a-cover').value.trim();
+  const body = { title:$('#a-title').value.trim(), artist:$('#a-artist').value.trim(), audioUrl:$('#a-url').value.trim(), coverUrl:cover, sectionId:$('#a-section').value||null };
+  if (!body.title || !body.audioUrl) return toast('العنوان والرابط مطلوبان','err');
+  try {
+    if (editAnId) await api('/api/admin/anasheed/'+encodeURIComponent(editAnId),{method:'PUT',body});
+    else           await api('/api/admin/anasheed',{method:'POST',body});
+    if ($('#a-bcast').checked && cover){
+      try { const r=await api('/api/admin/anasheed/broadcast-cover',{method:'POST',body:{coverUrl:cover}}); toast('تم تحديث '+(r.updated||0)+' نشيد','ok'); } catch{ toast('فشل التطبيق على الكل','err'); }
+    }
+    editAnId=null; ['a-title','a-artist','a-url','a-cover'].forEach(id=>$('#'+id).value=''); $('#a-section').value=''; $('#a-bcast').checked=false;
+    loadAnasheed(); toast('تم','ok');
+  } catch{ toast('فشل','err'); }
+});
+$('#a-bcast-now').addEventListener('click', async () => {
+  const cover = $('#a-cover').value.trim();
+  if (!cover) return toast('ضع رابط صورة في حقل الغلاف أولاً','err');
+  if (!confirm('سيتم استبدال صورة الغلاف في كل الأناشيد. متابعة؟')) return;
+  try { const r=await api('/api/admin/anasheed/broadcast-cover',{method:'POST',body:{coverUrl:cover}}); toast('تم تحديث '+(r.updated||0)+' نشيد','ok'); loadAnasheed(); }
+  catch{ toast('فشل','err'); }
+});
+$('#a-bcast-sec')?.addEventListener('click', async () => {
+  const cover = $('#a-cover').value.trim();
+  const sectionId = $('#a-section').value;
+  if (!cover) return toast('ضع رابط صورة في حقل الغلاف أولاً','err');
+  if (!sectionId) return toast('اختر القسم أولاً','err');
+  if (!confirm('سيتم تطبيق الغلاف على أناشيد ووسائط هذا القسم فقط. متابعة؟')) return;
+  try {
+    const r = await api('/api/admin/anasheed/broadcast-cover', { method:'POST', body:{ coverUrl:cover, sectionId } });
+    toast(`تم: ${r.updated||0} نشيد + ${r.mediaUpdated||0} عنصر داخل القسم`, 'ok');
+    loadAnasheed(); loadSections();
+  } catch { toast('فشل','err'); }
+});
+async function loadAnasheed(){
+  try {
+    const [{ items }, secRes] = await Promise.all([api('/api/admin/data'), api('/api/admin/sections').catch(()=>({items:[]}))]);
+    const secs = secRes.items||[];
+    const secMap = Object.fromEntries(secs.map(s=>[s.id,s.name]));
+    $('#a-section').innerHTML = '<option value="">— بدون قسم —</option>' + secs.map(s=>`<option value="${esc(s.id)}">${esc(s.name||'قسم')}</option>`).join('');
+    $('#an-list').innerHTML = items.map(a => `
+      <div class="item">
+        <div class="it-cover" style="${a.coverUrl?`background-image:url('${esc(a.coverUrl)}')`:''}"></div>
+        <div class="it-info"><div class="ti">${esc(a.title)}</div><div class="mt"><span class="badge">${esc(a.artist||'بدون منشد')}</span>${a.sectionId?` <span class="badge">📂 ${esc(secMap[a.sectionId]||'قسم محذوف')}</span>`:''}</div></div>
+        <div class="it-acts"><button class="btn tiny" data-an-ed="${a.id}">✏️</button><button class="btn tiny danger" data-an-del="${a.id}">🗑</button></div></div>`).join('');
+    $('#an-list').onclick = async e => {
+      const ed=e.target.closest('[data-an-ed]'), de=e.target.closest('[data-an-del]');
+      if (ed) { const a=items.find(x=>x.id===ed.dataset.anEd); editAnId=a.id; $('#a-title').value=a.title||''; $('#a-artist').value=a.artist||''; $('#a-url').value=a.audioUrl||''; $('#a-cover').value=a.coverUrl||''; $('#a-section').value=a.sectionId||''; window.scrollTo({top:0,behavior:'smooth'}); }
+      if (de) { if(!confirm('حذف؟')) return; await api('/api/admin/anasheed/'+encodeURIComponent(de.dataset.anDel),{method:'DELETE'}); loadAnasheed(); }
+    };
+  } catch{}
+}
+
+async function loadConfig(){
+  try {
+    const c = await api('/api/admin/app-config');
+    $('#c-app').value=c.appName||''; $('#c-brand').value=c.brandName||''; $('#c-htitle').value=c.homeTitle||''; $('#c-hsub').value=c.homeSubtitle||'';
+    const o=c.owner||{}, l=o.links||{};
+    $('#c-name').value=o.name||''; $('#c-photo').value=o.photoUrl||''; $('#c-bio').value=o.bio||'';
+    $('#c-intro-video').value=o.introVideoUrl||''; $('#c-intro-poster').value=o.introVideoPoster||'';
+    $('#c-tg').value=l.telegram||''; $('#c-yt').value=l.youtube||''; $('#c-fb').value=l.facebook||''; $('#c-ig').value=l.instagram||''; $('#c-tt').value=l.tiktok||''; $('#c-x').value=l.x||l.twitter||''; $('#c-wa').value=l.whatsapp||''; $('#c-web').value=l.website||'';
+    const th = c.theme||{};
+    if (th.primary)     $('#c-th-primary').value     = th.primary;
+    if (th.primary2)    $('#c-th-primary2').value    = th.primary2;
+    if (th.primaryDeep) $('#c-th-primarydeep').value = th.primaryDeep;
+    if (th.bg)          $('#c-th-bg').value          = th.bg;
+    if (th.surface)     $('#c-th-surface').value     = th.surface;
+    if (th.text)        $('#c-th-text').value        = th.text;
+    if (th.audioColor)  $('#c-th-audio').value       = th.audioColor;
+    if (th.audioColor2) $('#c-th-audio2').value      = th.audioColor2;
+    const st = await api('/api/admin/app-status');
+    $('#st-dis').checked=!!st.disabled; $('#st-msg').value=st.message||''; $('#st-ver').value=st.version||''; $('#st-url').value=st.updateUrl||'';
+  } catch{}
+}
+$('#c-save').addEventListener('click', async () => {
+  try {
+    await api('/api/admin/app-config', { method:'POST', body:{
+      appName:$('#c-app').value, brandName:$('#c-brand').value, homeTitle:$('#c-htitle').value, homeSubtitle:$('#c-hsub').value,
+      owner:{ name:$('#c-name').value, photoUrl:$('#c-photo').value, bio:$('#c-bio').value,
+        introVideoUrl:$('#c-intro-video').value, introVideoPoster:$('#c-intro-poster').value,
+        links:{ telegram:$('#c-tg').value, youtube:$('#c-yt').value, facebook:$('#c-fb').value, instagram:$('#c-ig').value, tiktok:$('#c-tt').value, x:$('#c-x').value, twitter:$('#c-x').value, whatsapp:$('#c-wa').value, website:$('#c-web').value } },
+      theme:{
+        primary:$('#c-th-primary').value, primary2:$('#c-th-primary2').value, primaryDeep:$('#c-th-primarydeep').value,
+        bg:$('#c-th-bg').value, surface:$('#c-th-surface').value, text:$('#c-th-text').value,
+        audioColor:$('#c-th-audio').value, audioColor2:$('#c-th-audio2').value
+      }
+    }});
+    toast('تم الحفظ','ok');
+  } catch{ toast('فشل','err'); }
+});
+$('#st-save').addEventListener('click', async () => {
+  try {
+    await api('/api/admin/app-status', { method:'POST', body:{
+      disabled:$('#st-dis').checked, message:$('#st-msg').value, version:$('#st-ver').value, updateUrl:$('#st-url').value
+    }});
+    toast('تم','ok');
+  } catch{ toast('فشل','err'); }
+});
+
+/* Boot */
+(async () => { renderChips(); await loadStats(); await loadPosts(); })();
+</script>
+</body>
+</html>

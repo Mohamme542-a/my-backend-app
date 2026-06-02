@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#07070a"/>
+<title>أثـيـر — منصة وسائط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ========== Design tokens ========== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,a{-webkit-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+:root{
+  --bg:#07070a;--bg-2:#0f0f14;--surface:#15151c;--surface-2:#1d1d27;--surface-3:#262633;
+  --line:rgba(255,255,255,.07);--line-2:rgba(255,255,255,.12);
+  --text:#f5f5f7;--muted:#9a9aa6;--dim:#6b6b78;
+  --red:#ef2b3d;--red-2:#ff4757;--red-deep:#a8000f;
+  --grad:linear-gradient(135deg,#ef2b3d 0%,#ff4757 50%,#7a0610 100%);
+  --grad-soft:linear-gradient(135deg,rgba(239,43,61,.15),rgba(122,6,16,.05));
+  --shadow:0 20px 60px -20px rgba(239,43,61,.4);
+  --card-shadow:0 10px 30px -10px rgba(0,0,0,.6),0 4px 12px rgba(239,43,61,.08);
+  --glass:rgba(20,20,28,.7);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Tajawal',system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:
+  radial-gradient(800px 500px at 80% -10%,rgba(239,43,61,.16),transparent 60%),
+  radial-gradient(700px 600px at -10% 110%,rgba(122,6,16,.20),transparent 55%);
+  pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:rgba(239,43,61,.3);border-radius:10px}
+
+/* ========== Silver side drawer ========== */
+:root{
+  --silver-1:#fafafa;--silver-2:#e8e8ec;--silver-3:#c8c8d0;--silver-4:#9a9aa6;--silver-5:#5a5a66;
+  --silver-grad:linear-gradient(135deg,#fafafa 0%,#e2e2e8 18%,#c3c3cb 38%,#ffffff 50%,#c3c3cb 62%,#e2e2e8 82%,#fafafa 100%);
+  --silver-grad-soft:linear-gradient(135deg,#f5f5f7 0%,#dcdce2 50%,#b8b8c0 100%);
+  --silver-shadow:0 24px 60px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+}
+#drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:120}
+#drawer-backdrop.show{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;bottom:0;right:0;width:min(86vw,360px);z-index:130;
+  background:linear-gradient(180deg,#1c1c22 0%,#15151c 60%,#0c0c12 100%);
+  border-left:1px solid rgba(255,255,255,.06);
+  transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
+  display:flex;flex-direction:column;padding-top:var(--safe-top);box-shadow:-20px 0 60px rgba(0,0,0,.7)}
+#drawer.show{transform:translateX(0)}
+.drawer-head{padding:18px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
+.drawer-head .dh-title{font-family:'Amiri',serif;font-size:26px;background:var(--silver-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(255,255,255,.15))}
+.drawer-close{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#e8e8ec;display:grid;place-items:center;cursor:pointer}
+.drawer-list{flex:1;overflow-y:auto;padding:8px 0}
+.dm-item{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;
+  color:#e8e8ec;font-family:'Reem Kufi',sans-serif;font-size:16px;font-weight:600;
+  border-bottom:1px solid rgba(255,255,255,.04);transition:.2s;position:relative;text-align:right}
+.dm-item:hover,.dm-item:active{background:rgba(255,255,255,.04)}
+.dm-item .dm-ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;
+  background:var(--silver-grad);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 4px 10px rgba(0,0,0,.45);color:#0c0c12;font-weight:900}
+.dm-item .dm-ic svg{width:20px;height:20px}
+.dm-item .dm-lbl{flex:1;background:var(--silver-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(0,0,0,.4))}
+.dm-item .dm-arrow{color:var(--silver-3);opacity:.7}
+.dm-item.home .dm-ic{background:var(--grad);color:#fff;box-shadow:var(--shadow)}
+.dm-item.home .dm-lbl{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Menu page (full page, opens directly) */
+#view-menu .menu-hero{position:relative;border-radius:20px;overflow:hidden;margin-bottom:14px;
+  background:var(--silver-grad-soft);padding:22px 18px;color:#0c0c12;
+  box-shadow:var(--silver-shadow)}
+#view-menu .menu-hero h1{font-family:'Reem Kufi',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+#view-menu .menu-hero p{font-size:12px;color:#3a3a44;opacity:.8}
+#view-menu .menu-back{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--line);padding:8px 14px;border-radius:50px;font-family:inherit;font-weight:700;cursor:pointer;margin-bottom:12px;font-size:13px}
+#view-menu .menu-back:hover{background:rgba(255,255,255,.08)}
+#view-menu .menu-section{margin-bottom:22px}
+#view-menu .menu-section-head{display:flex;align-items:center;gap:10px;margin:6px 4px 12px}
+#view-menu .menu-section-head h2{font-family:'Reem Kufi',sans-serif;font-size:17px;font-weight:700;flex:1}
+#view-menu .menu-section-head::before{content:"";width:3px;height:20px;background:var(--silver-grad);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+#view-menu .menu-section .post-card{margin-bottom:10px}
+
+/* ========== Splash ========== */
+#splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#1a0608,#000);z-index:200;transition:opacity .4s}
+#splash.hide{opacity:0;pointer-events:none}
+.splash-brand{font-family:'Amiri',serif;font-size:64px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+.splash-msg{margin-top:20px;color:var(--muted);font-size:13px;letter-spacing:2px}
+.spinner{width:36px;height:36px;border:3px solid rgba(239,43,61,.2);border-top-color:var(--red);border-radius:50%;margin-top:20px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ========== Shell ========== */
+#app{position:relative;z-index:1;min-height:100vh;padding-top:var(--safe-top);padding-bottom:calc(96px + var(--safe-bot))}
+.header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);background:rgba(7,7,10,.7);border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:'Amiri',serif;font-size:28px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);display:grid;place-items:center;cursor:pointer;transition:.2s}
+.icon-btn:active{transform:scale(.92)}
+.icon-btn:hover{border-color:var(--line-2);background:var(--surface-2)}
+
+/* ========== Tabs / Nav ========== */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:60;padding:10px 12px calc(10px + var(--safe-bot));background:rgba(7,7,10,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex;gap:6px;justify-content:space-around}
+.nav-btn{flex:1;background:transparent;border:none;color:var(--muted);padding:8px 4px;border-radius:14px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:.2s}
+.nav-btn.active{color:#fff;background:var(--grad);box-shadow:var(--shadow)}
+.nav-btn svg{width:22px;height:22px}
+
+main{padding:18px 14px;max-width:980px;margin:0 auto}
+.view{display:none;animation:fade .3s ease-out}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ========== Search ========== */
+.search{position:relative;margin-bottom:18px}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 46px 14px 16px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:.2s}
+.search input:focus{border-color:rgba(239,43,61,.5);background:var(--surface-2)}
+.search svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+
+/* ========== Section title ========== */
+.section-title{font-family:'Reem Kufi',sans-serif;font-size:20px;font-weight:700;margin:18px 4px 12px;display:flex;align-items:center;gap:10px}
+.section-title::before{content:"";width:4px;height:22px;background:var(--grad);border-radius:3px}
+
+/* ========== Empty / loading ========== */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty svg{width:64px;height:64px;opacity:.4;margin-bottom:12px}
+.skeleton{background:linear-gradient(90deg,var(--surface) 0%,var(--surface-2) 50%,var(--surface) 100%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:14px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-card{height:240px;margin-bottom:14px}
+
+/* ========== Post card ========== */
+.post-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;margin-bottom:18px;overflow:hidden;box-shadow:var(--card-shadow);transition:.25s}
+.post-card:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.post-card.pinned{border-color:rgba(239,43,61,.4)}
+.post-head{padding:14px 16px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.post-head h3{font-family:'Reem Kufi',sans-serif;font-size:17px;font-weight:700;line-height:1.4;flex:1}
+.pin-badge{font-size:10px;font-weight:900;color:#fff;background:var(--grad);padding:4px 8px;border-radius:50px;display:inline-flex;align-items:center;gap:4px}
+.post-body{padding:0 16px 12px;color:var(--muted);font-size:14px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.post-meta{padding:8px 16px 14px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--dim);border-top:1px solid var(--line);margin-top:8px}
+.post-meta .tag{background:var(--surface-2);color:var(--muted);padding:4px 10px;border-radius:50px;font-size:11px;font-weight:600}
+.post-meta .views{margin-inline-start:auto;display:flex;align-items:center;gap:4px}
+
+/* ========== Media slots ========== */
+.media-stack{display:flex;flex-direction:column}
+.media-slot{position:relative;width:100%;background:#000;overflow:hidden}
+.media-slot+.media-slot{border-top:1px solid var(--line)}
+.media-caption{padding:8px 16px;color:var(--muted);font-size:12px;background:var(--surface-2)}
+
+/* ========== Video player ========== */
+.vp{position:relative;width:100%;background:#000;aspect-ratio:16/9;overflow:hidden}
+.vp video{width:100%;height:100%;display:block;background:#000;object-fit:contain}
+.vp-poster{position:absolute;inset:0;background-size:cover;background-position:center;cursor:pointer;display:grid;place-items:center;transition:opacity .3s}
+.vp-poster.hide{opacity:0;pointer-events:none}
+.vp-play{width:74px;height:74px;border-radius:50%;background:var(--grad);display:grid;place-items:center;box-shadow:0 16px 48px rgba(239,43,61,.45);transition:transform .25s}
+.vp-poster:active .vp-play{transform:scale(.92)}
+.vp-play svg{width:30px;height:30px;color:#fff;margin-inline-start:3px}
+.vp-controls{position:absolute;left:0;right:0;bottom:0;padding:10px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.85));opacity:0;transition:opacity .25s;z-index:5}
+.vp.show-ctrl .vp-controls,.vp:hover .vp-controls{opacity:1}
+.vp-progress{position:relative;height:5px;background:rgba(255,255,255,.18);border-radius:50px;cursor:pointer;margin-bottom:10px;touch-action:none}
+.vp-buffered{position:absolute;inset:0;background:rgba(255,255,255,.25);border-radius:50px;transform-origin:left;transform:scaleX(0)}
+[dir="rtl"] .vp-buffered{transform-origin:right}
+.vp-played{position:absolute;inset:0;background:var(--grad);border-radius:50px;transform-origin:left;transform:scaleX(0)}
+[dir="rtl"] .vp-played{transform-origin:right}
+.vp-thumb{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#fff;transform:translate(50%,-50%);box-shadow:0 2px 6px rgba(0,0,0,.5);right:0;opacity:0;transition:opacity .2s}
+.vp-progress:hover .vp-thumb,.vp.show-ctrl .vp-thumb{opacity:1}
+.vp-row{display:flex;align-items:center;gap:6px;color:#fff;font-size:12px;font-weight:600}
+.vp-btn{width:36px;height:36px;border:none;border-radius:10px;background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center;cursor:pointer;transition:.15s}
+.vp-btn:hover{background:rgba(255,255,255,.16)}
+.vp-btn:active{transform:scale(.9)}
+.vp-btn svg{width:18px;height:18px}
+.vp-time{font-variant-numeric:tabular-nums;margin:0 8px;letter-spacing:.5px}
+.vp-spacer{flex:1}
+.vp-loader{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.3);z-index:4}
+.vp-loader.show{display:grid}
+.vp-loader .spinner{margin:0}
+.vp-speed-menu{position:absolute;bottom:60px;right:12px;background:rgba(20,20,28,.95);backdrop-filter:blur(10px);border:1px solid var(--line-2);border-radius:12px;padding:6px;display:none;z-index:6;min-width:90px}
+.vp-speed-menu.show{display:block}
+.vp-speed-menu button{display:block;width:100%;background:transparent;border:none;color:#fff;padding:8px 14px;font-family:inherit;font-size:13px;text-align:right;border-radius:8px;cursor:pointer}
+.vp-speed-menu button:hover,.vp-speed-menu button.active{background:var(--grad)}
+.vp:fullscreen{width:100vw;height:100vh;aspect-ratio:auto}
+.vp:fullscreen video{height:100%}
+.vp-gesture{position:absolute;inset:0;z-index:3}
+.vp-toast{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;z-index:7}
+.vp-toast.show{opacity:1}
+
+/* ========== Image gallery ========== */
+.gal{position:relative;width:100%;background:#000;aspect-ratio:4/3;overflow:hidden}
+.gal-track{display:flex;width:100%;height:100%;transition:transform .35s cubic-bezier(.2,.8,.2,1);touch-action:pan-y}
+.gal-slide{flex:0 0 100%;height:100%;display:grid;place-items:center}
+.gal-slide img{max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in}
+.gal-nav{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.5);border:none;color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(8px);z-index:2}
+.gal-nav svg{width:18px;height:18px}
+.gal-nav.prev{right:10px}
+.gal-nav.next{left:10px}
+.gal-dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}
+.gal-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);transition:.2s}
+.gal-dot.active{background:#fff;width:22px;border-radius:6px}
+.gal-counter{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px;backdrop-filter:blur(6px);z-index:2}
+
+/* ========== Single image ========== */
+.img-one{width:100%;background:#000}
+.img-one img{width:100%;height:auto;display:block;cursor:zoom-in;max-height:560px;object-fit:cover}
+
+/* ========== PDF card ========== */
+.pdf-card{padding:18px;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#1d1d27,#15151c)}
+.pdf-icon{width:56px;height:56px;border-radius:14px;background:var(--grad);display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow)}
+.pdf-icon svg{width:28px;height:28px;color:#fff}
+.pdf-info{flex:1;min-width:0}
+.pdf-info h4{font-family:'Reem Kufi',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdf-info p{font-size:12px;color:var(--muted)}
+.pdf-actions{display:flex;gap:6px}
+.pdf-btn{padding:8px 14px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--text);border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.pdf-btn.primary{background:var(--grad);border:none;box-shadow:var(--shadow)}
+
+/* ========== Audio card ========== */
+.audio-card{padding:14px 16px;background:linear-gradient(135deg,#1d1d27,#15151c)}
+.audio-card audio{width:100%;height:42px;border-radius:50px;outline:none;accent-color:#22c55e}
+.audio-card audio::-webkit-media-controls-panel{background:var(--surface-2)}
+
+/* Anasheed green play button */
+.an-row{display:flex;gap:12px;align-items:center;padding:12px}
+.an-cover{width:64px;height:64px;border-radius:14px;flex-shrink:0;background-size:cover;background-position:center;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.an-info{flex:1;min-width:0}
+.an-info h4{font-family:'Reem Kufi',sans-serif;font-size:15px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-info p{font-size:12px;color:var(--muted)}
+.play-green{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:grid;place-items:center;flex-shrink:0;
+  background:linear-gradient(135deg,#4ade80 0%,#22c55e 50%,#15803d 100%);
+  box-shadow:0 10px 26px rgba(34,197,94,.45),inset 0 1px 0 rgba(255,255,255,.25);
+  transition:transform .2s,box-shadow .2s,filter .2s}
+.play-green:hover{filter:brightness(1.1);box-shadow:0 14px 32px rgba(34,197,94,.6)}
+.play-green:active{transform:scale(.92)}
+.play-green svg{width:22px;height:22px;color:#fff;margin-inline-start:2px}
+.play-green.playing{background:linear-gradient(135deg,#16a34a,#15803d 60%,#064e1f)}
+
+/* Full-screen audio player with visualizer */
+#fap{position:fixed;inset:0;z-index:350;background:radial-gradient(circle at 50% 0%,#0a2a18,#000 70%);display:none;flex-direction:column;color:#fff;padding-top:var(--safe-top)}
+#fap.show{display:flex;animation:fade .3s}
+#fap .fap-bar{display:flex;align-items:center;padding:14px 16px}
+#fap .fap-bar h3{flex:1;text-align:center;font-family:'Reem Kufi',sans-serif;font-size:16px;font-weight:700}
+#fap .fap-art{flex:1;display:grid;place-items:center;padding:20px;position:relative}
+#fap .fap-cover{width:min(74vw,320px);aspect-ratio:1;border-radius:24px;background-size:cover;background-position:center;box-shadow:0 30px 80px rgba(34,197,94,.4),0 0 0 6px rgba(255,255,255,.05);background-color:#0a2a18}
+#fap .fap-cover.spin{animation:spin 14s linear infinite}
+#fap canvas{position:absolute;left:0;right:0;bottom:0;width:100%;height:120px;pointer-events:none;opacity:.95}
+#fap .fap-meta{text-align:center;padding:0 24px 8px}
+#fap .fap-meta h2{font-family:'Reem Kufi',sans-serif;font-size:22px;margin-bottom:4px}
+#fap .fap-meta p{color:#86efac;font-size:13px}
+#fap .fap-bottom{padding:14px 22px calc(28px + var(--safe-bot));background:linear-gradient(transparent,rgba(0,0,0,.6))}
+#fap .fap-prog{height:6px;background:rgba(255,255,255,.15);border-radius:50px;position:relative;cursor:pointer;touch-action:none;margin-bottom:8px}
+#fap .fap-prog-played{position:absolute;inset:0;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:50px;transform-origin:right;transform:scaleX(0)}
+#fap .fap-times{display:flex;justify-content:space-between;font-size:12px;color:#bbf7d0;font-variant-numeric:tabular-nums;margin-bottom:14px}
+#fap .fap-ctrls{display:flex;align-items:center;justify-content:center;gap:18px}
+#fap .fap-ctrls button{background:rgba(255,255,255,.08);border:none;color:#fff;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:.2s}
+#fap .fap-ctrls button:hover{background:rgba(255,255,255,.16)}
+#fap .fap-ctrls .fap-play{width:72px;height:72px;background:linear-gradient(135deg,#4ade80,#15803d);box-shadow:0 12px 32px rgba(34,197,94,.5)}
+#fap .fap-ctrls .fap-play svg{width:30px;height:30px}
+
+
+/* ========== Image viewer modal ========== */
+#img-viewer{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.95);display:none;align-items:center;justify-content:center;touch-action:none}
+#img-viewer.show{display:flex}
+#img-viewer img{max-width:100%;max-height:100%;transition:transform .25s;touch-action:none}
+#img-viewer .close{position:absolute;top:calc(16px + var(--safe-top));right:16px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(8px);z-index:2}
+
+/* ========== PDF viewer modal ========== */
+#pdf-viewer{position:fixed;inset:0;z-index:300;background:#1a1a22;display:none;flex-direction:column}
+#pdf-viewer.show{display:flex}
+#pdf-viewer .pv-bar{padding:calc(10px + var(--safe-top)) 12px 10px;background:#0f0f14;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+#pdf-viewer .pv-bar h4{flex:1;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pdf-viewer iframe{flex:1;width:100%;border:none;background:#000}
+
+/* ========== Toast ========== */
+.toast{position:fixed;bottom:calc(110px + var(--safe-bot));left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface-2);border:1px solid var(--line-2);color:var(--text);padding:12px 20px;border-radius:50px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.3s;z-index:400;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:linear-gradient(135deg,#ef2b3d,#7a0610)}
+
+/* ========== Owner card ========== */
+.owner{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;text-align:center;box-shadow:var(--card-shadow)}
+.owner img{width:90px;height:90px;border-radius:50%;border:3px solid rgba(239,43,61,.4);object-fit:cover;margin-bottom:14px}
+.owner h2{font-family:'Reem Kufi',sans-serif;font-size:22px;margin-bottom:8px}
+.owner p{color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:18px}
+.owner-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.owner-links a{width:44px;height:44px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);display:grid;place-items:center;transition:.2s;text-decoration:none}
+.owner-links a:hover{background:var(--grad);border-color:transparent;transform:translateY(-2px)}
+
+/* ========== Misc ========== */
+.pinned-strip{background:linear-gradient(135deg,rgba(239,43,61,.08),rgba(122,6,16,.04));border:1px solid rgba(239,43,61,.18);border-radius:18px;padding:12px;margin-bottom:14px}
+.pinned-strip-head{display:flex;align-items:center;gap:8px;color:#ff6b78;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:14px;margin:2px 4px 10px}
+.pinned-strip-list{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.pinned-strip-list::-webkit-scrollbar{display:none}
+.pinned-card{flex:0 0 160px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:right;cursor:pointer;color:var(--text);font-family:inherit;padding:0;transition:transform .15s}
+.pinned-card:active{transform:scale(.96)}
+.pinned-card .pc-cover{width:100%;height:84px;background:linear-gradient(135deg,#262633,#15151c) center/cover}
+.pinned-card .pc-meta{padding:8px 10px}
+.pinned-card h4{font-family:'Reem Kufi',sans-serif;font-size:13px;margin:0 0 2px;color:var(--text)}
+.pinned-card p{font-size:11px;color:var(--muted);margin:0}
+.owner-intro{border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+
+/* ========== Section cards grid (inside a side-menu page) ========== */
+.sec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:6px}
+.sec-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer;color:var(--text);font-family:inherit;text-align:right;padding:0;transition:transform .18s,border-color .18s,box-shadow .18s;box-shadow:var(--card-shadow)}
+.sec-card:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.sec-card:active{transform:scale(.97)}
+.sec-card .sc-cover{width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#262633,#15151c) center/cover;position:relative}
+.sec-card .sc-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.6))}
+.sec-card .sc-count{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:50px;z-index:1}
+.sec-card .sc-pin{position:absolute;top:8px;left:8px;background:var(--grad);color:#fff;font-size:10px;font-weight:900;padding:4px 8px;border-radius:50px;z-index:1}
+.sec-card .sc-meta{padding:10px 12px 12px}
+.sec-card .sc-meta h3{font-family:'Reem Kufi',sans-serif;font-size:14px;margin:0 0 3px;line-height:1.35}
+.sec-card .sc-meta p{font-size:11px;color:var(--muted);margin:0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:380px){
+  .brand{font-size:24px}
+  .icon-btn{width:38px;height:38px}
+  .nav-btn{font-size:10px}
+}
+</style>
+</head>
+<body>
+
+<!-- Splash -->
+<div id="splash">
+  <div class="splash-brand">أثـيـر</div>
+  <div class="spinner"></div>
+  <div class="splash-msg">جاري التحميل...</div>
+</div>
+
+<div id="app" style="display:none">
+  <header class="header">
+    <button class="icon-btn" id="btn-menu" aria-label="القائمة">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="brand">أثـيـر</div>
+    <button class="icon-btn" id="btn-refresh" aria-label="تحديث">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-15.5-6.3L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 15.5 6.3L21 16"/><path d="M21 21v-5h-5"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <!-- Feed view -->
+    <section class="view active" id="view-feed">
+      <div class="search">
+        <input type="search" id="search-input" placeholder="ابحث في المنشورات..." autocomplete="off"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <div id="feed"></div>
+    </section>
+
+    <!-- Menu page view (opened from side drawer, full-page) -->
+    <section class="view" id="view-menu">
+      <button class="menu-back" id="menu-back">→ رجوع</button>
+      <div class="menu-hero">
+        <h1 id="menu-title">—</h1>
+        <p id="menu-sub"></p>
+      </div>
+      <div id="menu-body"></div>
+    </section>
+
+    <!-- About view -->
+    <section class="view" id="view-about">
+      <div id="owner-card" class="owner">
+        <div class="splash-brand" style="font-size:38px">أثـيـر</div>
+      </div>
+    </section>
+  </main>
+
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-view="feed">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      الرئيسية
+    </button>
+    <button class="nav-btn" id="nav-menu-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      القوائم
+    </button>
+    <button class="nav-btn" data-view="about">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-4 4-7 8-7s8 3 8 7"/></svg>
+
+      حول
+    </button>
+  </nav>
+</div>
+
+<!-- Silver Side Drawer -->
+<div id="drawer-backdrop"></div>
+<aside id="drawer" role="dialog" aria-modal="true" aria-label="القائمة الجانبية">
+  <div class="drawer-head">
+    <div class="dh-title">أثـيـر</div>
+    <button class="drawer-close" id="drawer-close" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="drawer-list" id="drawer-list"></div>
+</aside>
+
+<!-- Image viewer -->
+<div id="img-viewer" role="dialog" aria-modal="true">
+  <button class="close" id="iv-close" aria-label="إغلاق">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <img id="iv-img" alt=""/>
+</div>
+
+<!-- PDF viewer -->
+<div id="pdf-viewer" role="dialog" aria-modal="true">
+  <div class="pv-bar">
+    <button class="icon-btn" id="pv-close" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <h4 id="pv-title">PDF</h4>
+    <a id="pv-download" class="icon-btn" target="_blank" rel="noopener" aria-label="تحميل">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+    </a>
+  </div>
+  <iframe id="pv-frame" allow="fullscreen"></iframe>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Full-screen audio player -->
+<div id="fap" role="dialog" aria-modal="true">
+  <div class="fap-bar">
+    <button class="icon-btn" id="fap-close" aria-label="إغلاق">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <h3>قيد التشغيل</h3>
+    <div style="width:42px"></div>
+  </div>
+  <div class="fap-art">
+    <div class="fap-cover" id="fap-cover"></div>
+    <canvas id="fap-canvas"></canvas>
+  </div>
+  <div class="fap-meta">
+    <h2 id="fap-title">—</h2>
+    <p id="fap-artist"></p>
+  </div>
+  <div class="fap-bottom">
+    <div class="fap-prog" id="fap-prog"><div class="fap-prog-played" id="fap-played"></div></div>
+    <div class="fap-times"><span id="fap-cur">0:00</span><span id="fap-dur">0:00</span></div>
+    <div class="fap-ctrls">
+      <button id="fap-back" aria-label="-10"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/></svg></button>
+      <button class="fap-play" id="fap-play" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="fap-fwd" aria-label="+10"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 4v5h-5"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- App-disabled overlay -->
+<div id="blocked" style="display:none;position:fixed;inset:0;z-index:500;background:radial-gradient(circle at 50% 30%,#1a0608,#000);color:#fff;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center">
+  <div style="font-family:'Amiri',serif;font-size:56px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:18px">أثـيـر</div>
+  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef2b3d" stroke-width="2" style="margin-bottom:14px"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9 19.1 19.1"/></svg>
+  <h2 style="font-family:'Reem Kufi',sans-serif;font-size:22px;margin-bottom:10px">التطبيق متوقف مؤقتاً</h2>
+  <p id="blocked-msg" style="color:#9a9aa6;font-size:14px;line-height:1.7;max-width:340px"></p>
+  <a id="blocked-update" target="_blank" rel="noopener" style="display:none;margin-top:18px;background:var(--grad);color:#fff;text-decoration:none;padding:12px 26px;border-radius:50px;font-weight:700;box-shadow:var(--shadow)">تحميل التحديث</a>
+</div>
+
+<script>
+/* ============================================================
+   أثير — Frontend v3.0 (Media platform)
+   ============================================================ */
+const API = (window.__API__ || location.origin).replace(/\/+$/,'');
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtNum = n => (n||0)>=1000 ? (n/1000).toFixed(1)+'K' : String(n||0);
+const DEFAULT_APP_NAME = 'أثير';
+const DEFAULT_BRAND_NAME = 'أثـيـر';
+const FONT_PRESETS = {
+  cairo: "'Cairo', system-ui, sans-serif",
+  tajawal: "'Tajawal', system-ui, sans-serif",
+  'reem-kufi': "'Reem Kufi', system-ui, sans-serif",
+  amiri: "'Amiri', serif",
+  default: "'Tajawal', system-ui, sans-serif",
+};
+
+function normalizeMediaUrl(url, meta={}){
+  const src = String(url || '').trim();
+  if (!src) return '';
+  if (/^blob:/i.test(src)) return src;
+  if (src.startsWith(API + '/api/stream')) return src;
+  const type = String(meta.type || '').trim();
+  const mime = String(meta.mime || '').trim();
+  const proxied = new URL(API + '/api/stream');
+  proxied.searchParams.set('u', src);
+  if (type) proxied.searchParams.set('type', type);
+  if (mime) proxied.searchParams.set('mime', mime);
+  return proxied.toString();
+}
+
+function applyBranding(cfg={}){
+  const appName = String(cfg.appName || cfg.brandName || DEFAULT_APP_NAME).trim() || DEFAULT_APP_NAME;
+  const brandName = String(cfg.brandName || cfg.appName || DEFAULT_BRAND_NAME).trim() || DEFAULT_BRAND_NAME;
+  const homeTitle = String(cfg.homeTitle || appName).trim() || appName;
+  const homeSubtitle = String(cfg.homeSubtitle || 'منصة وسائط احترافية').trim();
+  document.title = `${appName} — منصة وسائط`;
+  document.documentElement.lang = 'ar';
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) themeMeta.setAttribute('content', (cfg.theme && cfg.theme.bg) || '#07070a');
+  const headerBrand = document.querySelector('.brand');
+  if (headerBrand) headerBrand.textContent = brandName;
+  const splashBrand = document.querySelector('#splash .splash-brand');
+  if (splashBrand) splashBrand.textContent = brandName;
+  const aboutBrand = document.querySelector('#owner-card .splash-brand');
+  if (aboutBrand) aboutBrand.textContent = brandName;
+  const blockedBrand = document.querySelector('#blocked > div');
+  if (blockedBrand) blockedBrand.textContent = brandName;
+  const searchInput = $('#search-input');
+  if (searchInput) searchInput.placeholder = `ابحث في ${homeTitle}...`;
+  const feedView = $('#view-feed');
+  if (feedView) feedView.dataset.title = homeTitle;
+  const splashMsg = document.querySelector('#splash .splash-msg');
+  if (splashMsg) splashMsg.textContent = homeSubtitle || 'جاري التحميل...';
+}
+
+function applyFont(cfg={}){
+  const fontKey = String(cfg.fontFamily || cfg.font || 'default').toLowerCase();
+  const family = FONT_PRESETS[fontKey] || FONT_PRESETS.default;
+  document.documentElement.style.setProperty('--app-font-family', family);
+  document.body.style.fontFamily = family;
+}
+
+function detectSocialPlatform(url=''){
+  const value = String(url || '').trim().toLowerCase();
+  if (!value) return '';
+  if (value.includes('t.me') || value.includes('telegram.me')) return 'telegram';
+  if (value.includes('facebook.com') || value.includes('fb.com')) return 'facebook';
+  if (value.includes('instagram.com')) return 'instagram';
+  if (value.includes('youtube.com') || value.includes('youtu.be')) return 'youtube';
+  if (value.includes('tiktok.com')) return 'tiktok';
+  if (value.includes('x.com') || value.includes('twitter.com')) return 'twitter';
+  if (value.includes('wa.me') || value.includes('whatsapp.com')) return 'whatsapp';
+  return 'website';
+}
+
+function socialIcon(platform){
+  return ({ telegram:'📨', facebook:'📘', instagram:'📸', youtube:'▶️', tiktok:'🎵', twitter:'𝕏', whatsapp:'💬', website:'🌐' })[platform] || '🌐';
+}
+
+/* ===== Toast ===== */
+const toastEl = $('#toast');
+let toastTimer;
+function toast(msg, kind){
+  toastEl.textContent = msg;
+  toastEl.className = 'toast show' + (kind==='error'?' error':'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+}
+
+/* ===== Storage ===== */
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+/* ===== Simple API (no auth, no signing) ===== */
+async function apiCall(path, opts){
+  const method = (opts && opts.method) || 'GET';
+  const body = opts && opts.body ? (typeof opts.body==='string'?opts.body:JSON.stringify(opts.body)) : undefined;
+  const headers = {};
+  if (method!=='GET' && body) headers['content-type']='application/json';
+  const sep = path.includes('?') ? '&' : '?';
+  const url = method === 'GET' ? API + path + sep + '_=' + Date.now() : API + path;
+  const r = await fetch(url, { method, headers, body, cache:'no-store' });
+  if (!r.ok) throw new Error('api '+r.status);
+  return r.json();
+}
+
+/* ============================================================
+   VIDEO PLAYER — real <video>, controls, PiP, fullscreen,
+   resume position, speed, gestures, buffered bar
+   ============================================================ */
+function mountVideoPlayer(slotEl, src, opts={}){
+  const mediaSrc = normalizeMediaUrl(src, { type: 'video', mime: opts.mime || '' });
+  const id = 'v_'+Math.random().toString(36).slice(2,9);
+  const poster = opts.poster || '';
+  const wrap = document.createElement('div');
+  wrap.className = 'vp';
+  wrap.innerHTML = `
+    <video id="${id}" preload="metadata" playsinline webkit-playsinline crossorigin="anonymous" ${poster?`poster="${esc(poster)}"`:''}></video>
+    ${poster?`<div class="vp-poster" style="background-image:url('${esc(poster)}')"><div class="vp-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div>`:''}
+    <div class="vp-gesture"></div>
+    <div class="vp-loader"><div class="spinner"></div></div>
+    <div class="vp-toast" data-toast></div>
+    <div class="vp-controls">
+      <div class="vp-progress"><div class="vp-buffered"></div><div class="vp-played"></div><div class="vp-thumb"></div></div>
+      <div class="vp-row">
+        <button class="vp-btn" data-act="play" aria-label="تشغيل">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button class="vp-btn" data-act="back" aria-label="-10">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/></svg>
+        </button>
+        <button class="vp-btn" data-act="fwd" aria-label="+10">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 4v5h-5"/></svg>
+        </button>
+        <span class="vp-time" data-time>0:00 / 0:00</span>
+        <div class="vp-spacer"></div>
+        <button class="vp-btn" data-act="speed" aria-label="السرعة">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 11-14h-7z"/></svg>
+        </button>
+        <button class="vp-btn" data-act="pip" aria-label="نافذة">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><rect x="12" y="10" width="7" height="6" rx="1"/></svg>
+        </button>
+        <button class="vp-btn" data-act="mute" aria-label="كتم">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+        </button>
+        <button class="vp-btn" data-act="fs" aria-label="ملء">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9V3h6"/><path d="M21 9V3h-6"/><path d="M3 15v6h6"/><path d="M21 15v6h-6"/></svg>
+        </button>
+      </div>
+      <div class="vp-speed-menu">
+        ${[0.5,0.75,1,1.25,1.5,1.75,2].map(s=>`<button data-speed="${s}" class="${s===1?'active':''}">${s===1?'عادي':s+'×'}</button>`).join('')}
+      </div>
+    </div>`;
+  slotEl.appendChild(wrap);
+
+  const video   = wrap.querySelector('video');
+  const posterEl= wrap.querySelector('.vp-poster');
+  const loader  = wrap.querySelector('.vp-loader');
+  const ctrls   = wrap.querySelector('.vp-controls');
+  const playBtn = wrap.querySelector('[data-act="play"]');
+  const playIco = playBtn.querySelector('svg');
+  const timeEl  = wrap.querySelector('[data-time]');
+  const progEl  = wrap.querySelector('.vp-progress');
+  const playedEl= wrap.querySelector('.vp-played');
+  const buffEl  = wrap.querySelector('.vp-buffered');
+  const thumbEl = wrap.querySelector('.vp-thumb');
+  const speedMenu = wrap.querySelector('.vp-speed-menu');
+  const toastEl2  = wrap.querySelector('[data-toast]');
+  const gesture = wrap.querySelector('.vp-gesture');
+
+  // Source — HLS support
+  const isHls = /\.m3u8(\?|$)/i.test(src);
+  if (isHls && !video.canPlayType('application/vnd.apple.mpegurl')) {
+    // Load hls.js on demand
+    const sc = document.createElement('script');
+    sc.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js';
+    sc.onload = () => {
+      if (window.Hls && window.Hls.isSupported()){
+        const hls = new window.Hls({ enableWorker:true, lowLatencyMode:true });
+        hls.loadSource(mediaSrc); hls.attachMedia(video);
+      } else video.src = mediaSrc;
+    };
+    document.head.appendChild(sc);
+  } else {
+    video.src = mediaSrc;
+  }
+
+  // Resume position
+  const posKey = 'atheer.vpos.'+mediaSrc;
+  const savedPos = Number(store.get(posKey, 0)) || 0;
+  if (savedPos > 5) video.addEventListener('loadedmetadata', () => {
+    if (savedPos < video.duration - 10) video.currentTime = savedPos;
+  }, { once:true });
+
+  const fmt = t => { if (!isFinite(t)) return '0:00'; const m=Math.floor(t/60), s=Math.floor(t%60); return `${m}:${s<10?'0':''}${s}`; };
+  const showToast = msg => { toastEl2.textContent = msg; toastEl2.classList.add('show'); clearTimeout(toastEl2._t); toastEl2._t = setTimeout(()=>toastEl2.classList.remove('show'), 800); };
+
+  let ctrlTimer;
+  const showCtrls = () => {
+    wrap.classList.add('show-ctrl');
+    clearTimeout(ctrlTimer);
+    if (!video.paused) ctrlTimer = setTimeout(()=>wrap.classList.remove('show-ctrl'), 3000);
+  };
+
+  const setPlayIcon = playing => {
+    playIco.innerHTML = playing
+      ? '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>'
+      : '<path d="M8 5v14l11-7z"/>';
+  };
+
+  const togglePlay = () => {
+    if (video.paused) {
+      video.play().catch(e=>showToast('فشل التشغيل'));
+      posterEl?.classList.add('hide');
+    } else video.pause();
+  };
+
+  // Events
+  video.addEventListener('play',  () => { setPlayIcon(true); showCtrls(); });
+  video.addEventListener('pause', () => { setPlayIcon(false); wrap.classList.add('show-ctrl'); clearTimeout(ctrlTimer); });
+  video.addEventListener('waiting', () => loader.classList.add('show'));
+  video.addEventListener('playing',() => loader.classList.remove('show'));
+  video.addEventListener('canplay', () => loader.classList.remove('show'));
+  video.addEventListener('error',  () => { loader.classList.remove('show'); showToast('تعذر التشغيل'); });
+  video.addEventListener('ended',  () => { setPlayIcon(false); store.set(posKey, 0); });
+
+  let savePosT;
+  video.addEventListener('timeupdate', () => {
+    if (!isFinite(video.duration)) return;
+    const pct = (video.currentTime/video.duration)*100;
+    playedEl.style.transform = `scaleX(${pct/100})`;
+    thumbEl.style.right = pct+'%';
+    timeEl.textContent = `${fmt(video.currentTime)} / ${fmt(video.duration)}`;
+    clearTimeout(savePosT);
+    savePosT = setTimeout(()=>store.set(posKey, video.currentTime), 1000);
+  });
+  video.addEventListener('progress', () => {
+    if (!video.buffered.length || !isFinite(video.duration)) return;
+    const end = video.buffered.end(video.buffered.length-1);
+    buffEl.style.transform = `scaleX(${end/video.duration})`;
+  });
+
+  // Controls
+  wrap.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    e.stopPropagation();
+    const a = b.dataset.act;
+    if (a==='play') togglePlay();
+    else if (a==='back') { video.currentTime = Math.max(0, video.currentTime-10); showToast('-10 ث'); }
+    else if (a==='fwd')  { video.currentTime = Math.min(video.duration||0, video.currentTime+10); showToast('+10 ث'); }
+    else if (a==='mute') { video.muted = !video.muted; showToast(video.muted?'كتم':'صوت'); }
+    else if (a==='speed'){ speedMenu.classList.toggle('show'); }
+    else if (a==='fs')   { (document.fullscreenElement===wrap?document.exitFullscreen():wrap.requestFullscreen?.()).catch?.(()=>{}); }
+    else if (a==='pip')  {
+      if (document.pictureInPictureElement) document.exitPictureInPicture();
+      else video.requestPictureInPicture?.().catch(()=>showToast('غير مدعوم'));
+    }
+  });
+  speedMenu.addEventListener('click', e => {
+    const b = e.target.closest('[data-speed]'); if (!b) return;
+    e.stopPropagation();
+    video.playbackRate = Number(b.dataset.speed);
+    speedMenu.querySelectorAll('button').forEach(x=>x.classList.toggle('active', x===b));
+    speedMenu.classList.remove('show');
+    showToast(b.textContent);
+  });
+
+  // Progress seek (pointer)
+  let seeking = false;
+  const seekTo = e => {
+    const r = progEl.getBoundingClientRect();
+    const x = (e.touches?e.touches[0]:e).clientX;
+    let ratio = (x - r.left) / r.width;
+    if (document.documentElement.dir==='rtl') ratio = 1-ratio;
+    ratio = Math.max(0, Math.min(1, ratio));
+    if (isFinite(video.duration)) video.currentTime = ratio*video.duration;
+  };
+  progEl.addEventListener('pointerdown', e=>{ seeking=true; seekTo(e); progEl.setPointerCapture(e.pointerId); });
+  progEl.addEventListener('pointermove', e=>{ if(seeking) seekTo(e); });
+  progEl.addEventListener('pointerup',   e=>{ seeking=false; });
+
+  // Gestures: tap=toggle, double-tap=skip, swipe-vert in fs = ignore (avoid scroll fights)
+  let lastTap = 0;
+  gesture.addEventListener('click', e => {
+    const now = Date.now();
+    if (now - lastTap < 280) {
+      const r = wrap.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      if (x > r.width*0.6) { video.currentTime = Math.min((video.duration||0), video.currentTime+10); showToast('+10 ث'); }
+      else if (x < r.width*0.4) { video.currentTime = Math.max(0, video.currentTime-10); showToast('-10 ث'); }
+      lastTap = 0;
+    } else {
+      lastTap = now;
+      setTimeout(()=>{ if (lastTap===now) { togglePlay(); showCtrls(); } }, 280);
+    }
+  });
+
+  posterEl?.addEventListener('click', () => { posterEl.classList.add('hide'); video.play().catch(()=>{}); });
+
+  // Auto-pause when scrolled out
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting && !video.paused && !document.pictureInPictureElement) video.pause();
+  }), { threshold: 0.25 });
+  io.observe(wrap);
+
+  return { destroy(){ io.disconnect(); video.pause(); video.removeAttribute('src'); video.load(); } };
+}
+
+/* ============================================================
+   IMAGE GALLERY (swipe + dots) + viewer (pinch zoom-lite)
+   ============================================================ */
+function mountGallery(slotEl, urls){
+  if (urls.length === 1) {
+    const wrap = document.createElement('div');
+    wrap.className = 'img-one';
+    wrap.innerHTML = `<img src="${esc(urls[0])}" loading="lazy" alt=""/>`;
+    wrap.querySelector('img').addEventListener('click', () => openImage(urls[0]));
+    slotEl.appendChild(wrap);
+    return;
+  }
+  const wrap = document.createElement('div');
+  wrap.className = 'gal';
+  wrap.innerHTML = `
+    <div class="gal-counter"><span class="gc">1</span>/${urls.length}</div>
+    <div class="gal-track">${urls.map(u=>`<div class="gal-slide"><img src="${esc(u)}" loading="lazy" alt=""/></div>`).join('')}</div>
+    <button class="gal-nav prev" aria-label="السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+    <button class="gal-nav next" aria-label="التالي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
+    <div class="gal-dots">${urls.map((_,i)=>`<div class="gal-dot${i===0?' active':''}"></div>`).join('')}</div>`;
+  slotEl.appendChild(wrap);
+  const track = wrap.querySelector('.gal-track');
+  const dots  = wrap.querySelectorAll('.gal-dot');
+  const counter = wrap.querySelector('.gc');
+  let idx = 0;
+  const go = i => {
+    idx = Math.max(0, Math.min(urls.length-1, i));
+    track.style.transform = `translateX(${(document.documentElement.dir==='rtl'?1:-1)*idx*100}%)`;
+    dots.forEach((d,j)=>d.classList.toggle('active', j===idx));
+    counter.textContent = idx+1;
+  };
+  wrap.querySelector('.prev').addEventListener('click', () => go(idx-1));
+  wrap.querySelector('.next').addEventListener('click', () => go(idx+1));
+  // Swipe
+  let sx=0, dx=0, dragging=false;
+  track.addEventListener('pointerdown', e => { sx=e.clientX; dragging=true; track.style.transition='none'; });
+  track.addEventListener('pointermove', e => { if(!dragging) return; dx = e.clientX-sx; track.style.transform = `translateX(calc(${(document.documentElement.dir==='rtl'?1:-1)*idx*100}% + ${dx}px))`; });
+  track.addEventListener('pointerup', () => { dragging=false; track.style.transition=''; if (Math.abs(dx)>60) go(idx+(dx<0?(document.documentElement.dir==='rtl'?-1:1):(document.documentElement.dir==='rtl'?1:-1))); else go(idx); dx=0; });
+  track.querySelectorAll('img').forEach((img,i) => img.addEventListener('click', () => Math.abs(dx)<5 && openImage(urls[i])));
+}
+
+/* ===== Image viewer (modal) ===== */
+const ivEl  = $('#img-viewer'); const ivImg = $('#iv-img');
+let ivScale = 1, ivTx=0, ivTy=0;
+function openImage(url){
+  ivImg.src = url; ivScale=1; ivTx=0; ivTy=0; ivImg.style.transform='';
+  ivEl.classList.add('show');
+}
+$('#iv-close').addEventListener('click', () => ivEl.classList.remove('show'));
+ivEl.addEventListener('click', e => { if (e.target===ivEl) ivEl.classList.remove('show'); });
+ivImg.addEventListener('click', e => { e.stopPropagation(); ivScale = ivScale===1 ? 2.2 : 1; ivTx=0; ivTy=0; ivImg.style.transform = `scale(${ivScale})`; });
+// Simple pinch
+let pinchStart = 0, baseScale = 1;
+ivEl.addEventListener('touchstart', e => { if (e.touches.length===2){ pinchStart = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); baseScale = ivScale; }});
+ivEl.addEventListener('touchmove',  e => { if (e.touches.length===2 && pinchStart){ const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); ivScale = Math.max(1, Math.min(4, baseScale * d/pinchStart)); ivImg.style.transform = `scale(${ivScale})`; e.preventDefault(); }}, {passive:false});
+
+/* ===== PDF viewer ===== */
+const pvEl = $('#pdf-viewer'); const pvFrame = $('#pv-frame'); const pvTitle = $('#pv-title'); const pvDl = $('#pv-download');
+function openPdf(url, title){
+  const safeUrl = normalizeMediaUrl(url, { type: 'pdf', mime: 'application/pdf' });
+  pvTitle.textContent = title || 'PDF';
+  pvDl.href = safeUrl;
+  // Google viewer fallback for inline PDF on mobile
+  const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+  pvFrame.src = isMobile
+    ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(safeUrl)}`
+    : safeUrl + '#toolbar=1&navpanes=0';
+  pvEl.classList.add('show');
+}
+$('#pv-close').addEventListener('click', () => { pvEl.classList.remove('show'); pvFrame.src=''; });
+
+/* ============================================================
+   Post rendering
+   ============================================================ */
+function detectType(url, hint){
+  if (hint) {
+    const normalizedHint = String(hint).toLowerCase();
+    if (['video','audio','image','pdf','text'].includes(normalizedHint)) return normalizedHint;
+    if (normalizedHint.startsWith('video/')) return 'video';
+    if (normalizedHint.startsWith('audio/')) return 'audio';
+    if (normalizedHint.startsWith('image/')) return 'image';
+    if (normalizedHint.includes('pdf')) return 'pdf';
+  }
+  const u = String(url||'');
+  try {
+    const path = new URL(u, location.origin).pathname.toLowerCase();
+    const ext = path.split('.').pop();
+    if (['mp4','m4v','mov','webm','mkv','m3u8','ogv','avi','3gp'].includes(ext)) return 'video';
+    if (['mp3','m4a','aac','ogg','oga','wav','flac','opus'].includes(ext)) return 'audio';
+    if (['jpg','jpeg','png','webp','gif','avif','heic','bmp','svg'].includes(ext)) return 'image';
+    if (ext === 'pdf') return 'pdf';
+    if (/\/video\/upload\//.test(path)) return /\.(mp3|m4a|aac|wav|ogg|oga|flac|opus)/.test(path) ? 'audio' : 'video';
+    if (/\/image\/upload\//.test(path)) return 'image';
+    if (/\/raw\/upload\/.*\.pdf/.test(path)) return 'pdf';
+    // archive.org commonly serves video files under /download/ without
+    // browser-recognised extensions in some referer flows
+    if (/(^|\.)archive\.org$/.test(new URL(u, location.origin).hostname) && /\/download\//.test(path)) {
+      if (/\.(mp4|m4v|mov|webm|mkv|ogv|avi)/i.test(path)) return 'video';
+      if (/\.(mp3|m4a|aac|wav|ogg|flac|opus)/i.test(path)) return 'audio';
+      return 'video'; // safer default for archive.org details/download links
+    }
+  } catch {}
+  if (/cloudinary.*\/video\/upload\//i.test(u)) return 'video';
+  if (/cloudinary.*\/image\/upload\//i.test(u)) return 'image';
+  return 'text';
+}
+
+function renderPost(p){
+  const card = document.createElement('article');
+  card.className = 'post-card' + (p.pinned?' pinned':'');
+  card.dataset.id = p.id;
+
+  // Head
+  const head = `<div class="post-head"><h3>${esc(p.title||'بدون عنوان')}</h3>${p.pinned?'<span class="pin-badge">📌 مثبت</span>':''}</div>`;
+
+  // Media stack — group consecutive images
+  const stack = document.createElement('div');
+  stack.className = 'media-stack';
+  const media = Array.isArray(p.media) ? p.media : [];
+  let i = 0;
+  while (i < media.length) {
+    const m = media[i];
+    const type = detectType(m.url, m.type);
+    const slot = document.createElement('div'); slot.className = 'media-slot';
+
+    if (type === 'image') {
+      // group consecutive images into a gallery
+      const group = [];
+      while (i < media.length && detectType(media[i].url, media[i].type || media[i].mime) === 'image') {
+        group.push(normalizeMediaUrl(media[i].url, media[i]));
+        i++;
+      }
+      mountGallery(slot, group);
+      stack.appendChild(slot);
+      continue;
+    }
+    if (type === 'video') {
+      mountVideoPlayer(slot, m.url, { poster: m.poster || m.thumb || p.coverUrl, mime: m.mime || '' });
+    } else if (type === 'audio') {
+      slot.classList.add('audio-card');
+      const aid = 'a_'+Math.random().toString(36).slice(2,8);
+      slot.innerHTML = `<div class="an-row" style="padding:6px 4px">
+        <div class="an-cover" style="background:${m.poster||m.thumb||p.coverUrl?`url('${esc(m.poster||m.thumb||p.coverUrl)}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)'}"></div>
+        <div class="an-info"><h4>${esc(m.caption||p.title||'تسجيل صوتي')}</h4><p>اضغط لتشغيل ملء الشاشة</p></div>
+        <button class="play-green" data-fap='${esc(JSON.stringify({url:normalizeMediaUrl(m.url, { type:'audio', mime:m.mime || '' }),title:m.caption||p.title||'تسجيل',artist:'',cover:m.poster||m.thumb||p.coverUrl||''}))}' aria-label="تشغيل">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>`;
+    } else if (type === 'pdf') {
+      slot.classList.add('pdf-card');
+      slot.innerHTML = `
+        <div class="pdf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div class="pdf-info"><h4>${esc(m.caption||'ملف PDF')}</h4><p>اضغط للعرض</p></div>
+        <div class="pdf-actions"><button class="pdf-btn primary" data-open-pdf="${esc(normalizeMediaUrl(m.url, { type:'pdf', mime:m.mime || 'application/pdf' }))}" data-title="${esc(m.caption||'PDF')}">عرض</button></div>`;
+    } else {
+      slot.innerHTML = `<div style="padding:14px 16px;color:var(--text);white-space:pre-wrap">${esc(m.text||'')}</div>`;
+    }
+    if (m.caption && type !== 'pdf') {
+      const cap = document.createElement('div'); cap.className = 'media-caption'; cap.textContent = m.caption;
+      slot.appendChild(cap);
+    }
+    stack.appendChild(slot);
+    i++;
+  }
+
+  // Body
+  const body = p.body ? `<div class="post-body">${esc(p.body)}</div>` : '';
+
+  // Meta
+  const tags = (p.tags||[]).slice(0,5).map(t=>`<span class="tag">#${esc(t)}</span>`).join('');
+  const meta = `<div class="post-meta">${tags}<span class="views">👁 ${fmtNum(p.views)}</span></div>`;
+
+  card.innerHTML = head + body;
+  card.appendChild(stack);
+  card.insertAdjacentHTML('beforeend', meta);
+
+  // Open PDF delegation
+  card.addEventListener('click', e => {
+    const b = e.target.closest('[data-open-pdf]');
+    if (b) openPdf(b.dataset.openPdf, b.dataset.title);
+  });
+
+  // Track view once
+  const seenKey = 'atheer.seen.'+p.id;
+  if (!store.get(seenKey, 0)) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) {
+        store.set(seenKey, 1);
+        fetch(API+'/api/posts/'+encodeURIComponent(p.id)+'/view', {method:'POST'}).catch(()=>{});
+        io.disconnect();
+      }
+    }));
+    io.observe(card);
+  }
+
+  return card;
+}
+
+/* ============================================================
+   Data + views
+   ============================================================ */
+const state = { posts: [], filter: '' };
+
+async function loadFeed(){
+  const feed = $('#feed');
+  feed.innerHTML = '<div class="skeleton sk-card"></div><div class="skeleton sk-card"></div>';
+  try {
+    const [pr, sr] = await Promise.all([
+      apiCall('/api/posts').catch(()=>({items:[]})),
+      apiCall('/api/sections').catch(()=>({items:[]})),
+    ]);
+    state.posts = pr.items || [];
+    state.pinnedSecs = (sr.items||[]).filter(s => s.pinned && !s.hidden);
+    renderFeed();
+  } catch(e) {
+    console.error(e);
+    feed.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><p>تعذّر تحميل المنشورات</p></div>`;
+    toast('تعذّر الاتصال بالخادم','error');
+  }
+}
+
+function renderFeed(){
+  const feed = $('#feed');
+  const q = state.filter.trim().toLowerCase();
+  const items = q
+    ? state.posts.filter(p => (p.title||'').toLowerCase().includes(q) || (p.body||'').toLowerCase().includes(q) || (p.tags||[]).some(t=>String(t).toLowerCase().includes(q)))
+    : state.posts;
+  feed.innerHTML = '';
+  if (!q && Array.isArray(state.pinnedSecs) && state.pinnedSecs.length){
+    const strip = document.createElement('div');
+    strip.className = 'pinned-strip';
+    strip.innerHTML = `<div class="pinned-strip-head"><span>📌 مقترحات مثبّتة</span></div>
+      <div class="pinned-strip-list">${state.pinnedSecs.map(s => `
+        <button class="pinned-card" data-go-sec="${esc(s.id)}" data-menu="${esc(s.menuId||'')}">
+          <div class="pc-cover" style="${s.imageUrl?`background-image:url('${esc(s.imageUrl)}')`:''}"></div>
+          <div class="pc-meta"><h4>${esc(s.name||'قسم')}</h4><p>${(s.media||[]).length} عنصر</p></div>
+        </button>`).join('')}</div>`;
+    feed.appendChild(strip);
+    strip.addEventListener('click', e => {
+      const b = e.target.closest('[data-go-sec]'); if (!b) return;
+      const sid = b.dataset.goSec, mid = b.dataset.menu;
+      if (sid) openSectionPage(sid, mid || '');
+      else if (mid) openMenuPage(mid);
+    });
+  }
+  if (!items.length && !(state.pinnedSecs||[]).length){
+    feed.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>${q?'لا نتائج للبحث':'لا توجد منشورات بعد'}</p></div>`;
+    return;
+  }
+  items.forEach(p => feed.appendChild(renderPost(p)));
+}
+
+/* ============================================================
+   Side menu (drawer) + Menu page
+   ============================================================ */
+const menuState = { items: [], sections: [], anasheed: [], loaded: false };
+
+async function loadMenuData(force){
+  // Always refetch — admins push updates frequently and a stale cache makes
+  // newly-added sections invisible to users.
+  try {
+    const [mn, sc, an] = await Promise.all([
+      apiCall('/api/side-menu').catch(()=>({items:[]})),
+      apiCall('/api/sections').catch(()=>({items:[]})),
+      apiCall('/api/data').catch(()=>({items:[]})),
+    ]);
+    menuState.items = mn.items || [];
+    menuState.sections = sc.items || [];
+    menuState.anasheed = an.items || [];
+    menuState.loaded = true;
+  } catch(e){ console.error(e); }
+}
+
+async function openDrawer(){
+  $('#drawer-backdrop').classList.add('show');
+  $('#drawer').classList.add('show');
+  const list = $('#drawer-list');
+  list.innerHTML = '<div class="dm-item" style="opacity:.5"><div class="dm-ic"></div><span class="dm-lbl">جاري التحميل...</span></div>';
+  await loadMenuData(true);
+  const items = menuState.items.filter(m => !m.hidden);
+  const homeRow = `<div class="dm-item home" data-go="home">
+    <div class="dm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+    <span class="dm-lbl">الرئيسية</span>
+    <svg class="dm-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+  </div>`;
+  const rows = items.map(m => `
+    <div class="dm-item" data-go="menu" data-id="${esc(m.id)}">
+      <div class="dm-ic">${m.icon?esc(m.icon):'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 6h16M4 12h16M4 18h10\"/></svg>'}</div>
+      <span class="dm-lbl">${esc(m.label||'بدون اسم')}</span>
+      <svg class="dm-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+    </div>`).join('');
+  list.innerHTML = homeRow + rows + (items.length?'':'<div class="empty" style="padding:30px"><p>لم يضف الأدمن أي قائمة بعد</p></div>');
+}
+function closeDrawer(){
+  $('#drawer-backdrop').classList.remove('show');
+  $('#drawer').classList.remove('show');
+}
+
+function renderMediaSlot(m){
+  const type = detectType(m.url, m.type || m.mime);
+  const slot = document.createElement('div'); slot.className = 'media-slot';
+  if (type === 'image'){
+    const imageUrl = normalizeMediaUrl(m.url, m);
+    const wrap = document.createElement('div'); wrap.className='img-one';
+    wrap.innerHTML = `<img src="${esc(imageUrl)}" loading="lazy" alt=""/>`;
+    wrap.querySelector('img').addEventListener('click', ()=>openImage(imageUrl));
+    slot.appendChild(wrap);
+  } else if (type === 'video'){
+    mountVideoPlayer(slot, m.url, { poster: m.poster || m.thumb, mime: m.mime || '' });
+  } else if (type === 'audio'){
+    slot.classList.add('audio-card');
+    slot.innerHTML = `<div class="an-row" style="padding:6px 4px">
+      <div class="an-cover" style="background:${m.poster||m.thumb?`url('${esc(m.poster||m.thumb)}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)'}"></div>
+      <div class="an-info"><h4>${esc(m.caption||'تسجيل صوتي')}</h4><p>اضغط لتشغيل ملء الشاشة</p></div>
+      <button class="play-green" data-fap='${esc(JSON.stringify({url:normalizeMediaUrl(m.url, { type:'audio', mime:m.mime || '' }),title:m.caption||'تسجيل',artist:'',cover:m.poster||m.thumb||''}))}' aria-label="تشغيل">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button></div>`;
+  } else if (type === 'pdf'){
+    slot.classList.add('pdf-card');
+    slot.innerHTML = `
+      <div class="pdf-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+      <div class="pdf-info"><h4>${esc(m.caption||'ملف PDF')}</h4><p>اضغط للعرض</p></div>
+      <div class="pdf-actions"><button class="pdf-btn primary" data-open-pdf="${esc(normalizeMediaUrl(m.url, { type:'pdf', mime:m.mime || 'application/pdf' }))}" data-title="${esc(m.caption||'PDF')}">عرض</button></div>`;
+  } else {
+    slot.innerHTML = `<div style="padding:14px 16px;color:var(--text);white-space:pre-wrap">${esc(m.text||m.caption||'')}</div>`;
+  }
+  if (m.caption && type !== 'pdf' && type !== 'audio'){
+    const cap = document.createElement('div'); cap.className = 'media-caption'; cap.textContent = m.caption;
+    slot.appendChild(cap);
+  }
+  return slot;
+}
+
+async function openMenuPage(menuId){
+  closeDrawer();
+  await loadMenuData(true);
+  const menu = menuState.items.find(m => m.id === menuId);
+  if (!menu){ toast('القائمة غير موجودة','error'); return; }
+  // Switch view
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  $$('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $('#view-menu').classList.add('active');
+  $('#menu-title').textContent = menu.label || 'قائمة';
+  // Reset back button: from a menu page → return to feed
+  const backBtn = $('#menu-back');
+  backBtn.textContent = '→ رجوع';
+  backBtn.onclick = () => showHomeView();
+  // Find sections attached to this menu (by menuId, or fallback by sectionIds list)
+  let secs = menuState.sections.filter(s => !s.hidden && String(s.menuId||'') === String(menu.id));
+  if (!secs.length && Array.isArray(menu.sectionIds) && menu.sectionIds.length){
+    const idSet = new Set(menu.sectionIds.map(String));
+    secs = menuState.sections.filter(s => !s.hidden && idSet.has(String(s.id)));
+  }
+  $('#menu-sub').textContent = secs.length ? `${secs.length} قسم` : 'لا توجد أقسام في هذه القائمة بعد';
+  const body = $('#menu-body');
+  body.innerHTML = '';
+  if (!secs.length){
+    body.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><p>لا توجد أقسام في هذه القائمة بعد</p></div>`;
+    return;
+  }
+  // Render section CARDS only — clicking a card opens its dedicated page
+  const grid = document.createElement('div'); grid.className = 'sec-grid';
+  secs.forEach(sec => {
+    const mediaCount = (Array.isArray(sec.media) ? sec.media.length : 0)
+      + (menuState.anasheed||[]).filter(a => String(a.sectionId||'') === String(sec.id)).length;
+    const cover = sec.imageUrl || (Array.isArray(sec.media) && sec.media.find(m => m.type==='image' && m.url)?.url) || '';
+    const card = document.createElement('button');
+    card.className = 'sec-card';
+    card.dataset.goSection = sec.id;
+    card.dataset.fromMenu = menu.id;
+    card.innerHTML = `
+      <div class="sc-cover" style="${cover?`background-image:url('${esc(cover)}')`:''}">
+        ${sec.pinned?'<span class="sc-pin">📌</span>':''}
+        <span class="sc-count">${mediaCount} عنصر</span>
+      </div>
+      <div class="sc-meta">
+        <h3>${esc(sec.name||'قسم')}</h3>
+        ${sec.description?`<p>${esc(sec.description)}</p>`:''}
+      </div>`;
+    grid.appendChild(card);
+  });
+  body.appendChild(grid);
+  grid.addEventListener('click', e => {
+    const b = e.target.closest('[data-go-section]'); if (!b) return;
+    openSectionPage(b.dataset.goSection, b.dataset.fromMenu);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Dedicated page for a single section's media. The drawer/back button returns
+// to the parent menu view rather than the feed so users don't lose context.
+async function openSectionPage(sectionId, parentMenuId){
+  await loadMenuData(true);
+  const sec = menuState.sections.find(s => String(s.id) === String(sectionId));
+  if (!sec){ toast('القسم غير موجود','error'); return; }
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  $$('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $('#view-menu').classList.add('active');
+  $('#menu-title').textContent = sec.name || 'قسم';
+  $('#menu-sub').textContent = sec.description || '';
+  // Wire back button to the parent menu if we came from one
+  const back = $('#menu-back');
+  back.textContent = '→ رجوع';
+  back.onclick = parentMenuId
+    ? () => openMenuPage(parentMenuId)
+    : () => showHomeView();
+  const body = $('#menu-body');
+  body.innerHTML = '';
+  const media = Array.isArray(sec.media) ? sec.media.slice() : [];
+  // Append legacy anasheed attached to THIS section only
+  (menuState.anasheed||[])
+    .filter(a => String(a.sectionId||'') === String(sec.id))
+    .forEach(a => media.push({
+      type: 'audio', url: a.audioUrl, caption: a.title || '',
+      poster: a.coverUrl || sec.imageUrl || '',
+      thumb:  a.coverUrl || sec.imageUrl || '',
+      _artist: a.artist || ''
+    }));
+  if (!media.length){
+    body.innerHTML = '<div class="empty" style="padding:40px"><p>لا توجد ملفات في هذا القسم بعد</p></div>';
+    return;
+  }
+  const stack = document.createElement('div'); stack.className = 'post-card';
+  const inner = document.createElement('div'); inner.className = 'media-stack';
+  media.forEach(m => inner.appendChild(renderMediaSlot(m)));
+  stack.appendChild(inner);
+  body.appendChild(stack);
+  body.onclick = e => {
+    const b = e.target.closest('[data-open-pdf]');
+    if (b) openPdf(b.dataset.openPdf, b.dataset.title);
+  };
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showHomeView(){
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  $$('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $('#view-feed').classList.add('active');
+  const homeBtn = document.querySelector('.nav-btn[data-view="feed"]');
+  homeBtn && homeBtn.classList.add('active');
+}
+
+async function loadOwner(){
+  try {
+    const cfg = await apiCall('/api/app-config');
+    const o = cfg.owner || {};
+    const links = o.links || {};
+    const card = $('#owner-card');
+    const socialEntries = Array.from(new Set(Object.values(links).filter(Boolean))).map(url => {
+      const platform = detectSocialPlatform(url);
+      return `<a href="${esc(url)}" target="_blank" rel="noopener" aria-label="${platform}">${socialIcon(platform)}</a>`;
+    }).join('');
+    const introHtml = o.introVideoUrl
+      ? `<div class="owner-intro" style="margin-top:18px"></div>`
+      : '';
+    card.innerHTML = `
+      ${o.photoUrl ? `<img src="${esc(o.photoUrl)}" alt="">` : ''}
+      <h2>${esc(o.name||cfg.brandName||DEFAULT_APP_NAME)}</h2>
+      <p>${esc(o.bio||'منصة وسائط احترافية')}</p>
+      <div class="owner-links">${socialEntries}</div>
+      ${introHtml}`;
+    if (o.introVideoUrl) {
+      mountVideoPlayer(card.querySelector('.owner-intro'), o.introVideoUrl, { poster: o.introVideoPoster || o.photoUrl || '', mime: 'video/mp4' });
+    }
+  } catch(e){}
+}
+
+/* (removed legacy anasheed/sections view — replaced by side-drawer menu pages) */
+
+/* ===== Full-screen audio player (with frequency visualizer) ===== */
+const fap = {
+  el: $('#fap'), audio: null, ctx: null, analyser: null, src: null, raf: 0,
+  playing: false, playlist: [], idx: 0,
+  open(track, list){
+    if (list) { this.playlist = list; this.idx = Math.max(0, list.findIndex(t=>t.url===track.url)); }
+    else { this.playlist = [track]; this.idx = 0; }
+    this.load(track);
+    this.el.classList.add('show');
+  },
+  load(t){
+    if (!this.audio){
+      this.audio = new Audio();
+      this.audio.crossOrigin = 'anonymous';
+      this.audio.addEventListener('timeupdate', () => this.tick());
+      this.audio.addEventListener('loadedmetadata', () => this.tick());
+      this.audio.addEventListener('ended', () => this.next());
+      this.audio.addEventListener('play',  () => { this.playing=true; this.setIcon(); $('#fap-cover').classList.add('spin'); this.startViz(); });
+      this.audio.addEventListener('pause', () => { this.playing=false; this.setIcon(); $('#fap-cover').classList.remove('spin'); });
+      this.audio.addEventListener('error', () => toast('فشل تشغيل الأنشودة','error'));
+    }
+      this.audio.src = normalizeMediaUrl(t.url, { type:'audio' });
+    $('#fap-title').textContent = t.title||'—';
+    $('#fap-artist').textContent = t.artist||'';
+    $('#fap-cover').style.background = t.cover?`url('${t.cover}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)';
+    this.audio.play().catch(()=>{});
+  },
+  setIcon(){
+    $('#fap-play').innerHTML = this.playing
+      ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  },
+  fmt(t){ if(!isFinite(t)) return '0:00'; const m=Math.floor(t/60), s=Math.floor(t%60); return `${m}:${s<10?'0':''}${s}`; },
+  tick(){
+    if (!this.audio) return;
+    const d = this.audio.duration||0, c = this.audio.currentTime||0;
+    $('#fap-cur').textContent = this.fmt(c);
+    $('#fap-dur').textContent = this.fmt(d);
+    $('#fap-played').style.transform = `scaleX(${d?c/d:0})`;
+  },
+  next(){ if (this.idx < this.playlist.length-1) { this.idx++; this.load(this.playlist[this.idx]); } else this.audio.pause(); },
+  startViz(){
+    try {
+      if (!this.ctx) this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      if (!this.src) {
+        this.src = this.ctx.createMediaElementSource(this.audio);
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 128;
+        this.src.connect(this.analyser);
+        this.analyser.connect(this.ctx.destination);
+      }
+      const cv = $('#fap-canvas'); const c2 = cv.getContext('2d');
+      const data = new Uint8Array(this.analyser.frequencyBinCount);
+      const draw = () => {
+        if (!this.playing) { c2.clearRect(0,0,cv.width,cv.height); cancelAnimationFrame(this.raf); return; }
+        cv.width = cv.clientWidth; cv.height = cv.clientHeight;
+        this.analyser.getByteFrequencyData(data);
+        c2.clearRect(0,0,cv.width,cv.height);
+        const bars = data.length, bw = cv.width/bars;
+        for (let i=0;i<bars;i++){
+          const h = (data[i]/255)*cv.height;
+          const g = c2.createLinearGradient(0, cv.height-h, 0, cv.height);
+          g.addColorStop(0,'#4ade80'); g.addColorStop(1,'#15803d');
+          c2.fillStyle = g;
+          c2.fillRect(i*bw+1, cv.height-h, bw-2, h);
+        }
+        this.raf = requestAnimationFrame(draw);
+      };
+      draw();
+    } catch(e){ console.warn('viz', e); }
+  },
+  close(){ this.el.classList.remove('show'); if (this.audio) this.audio.pause(); cancelAnimationFrame(this.raf); }
+};
+$('#fap-close').addEventListener('click', () => fap.close());
+$('#fap-play').addEventListener('click', () => { if (!fap.audio) return; fap.audio.paused?fap.audio.play():fap.audio.pause(); });
+$('#fap-back').addEventListener('click', () => { if (fap.audio) fap.audio.currentTime = Math.max(0, fap.audio.currentTime-10); });
+$('#fap-fwd').addEventListener('click',  () => { if (fap.audio) fap.audio.currentTime = Math.min(fap.audio.duration||0, fap.audio.currentTime+10); });
+(() => {
+  const prog = $('#fap-prog');
+  const seek = e => {
+    if (!fap.audio || !isFinite(fap.audio.duration)) return;
+    const r = prog.getBoundingClientRect();
+    const x = (e.touches?e.touches[0]:e).clientX;
+    let ratio = (x-r.left)/r.width;
+    if (document.documentElement.dir==='rtl') ratio = 1-ratio;
+    ratio = Math.max(0,Math.min(1,ratio));
+    fap.audio.currentTime = ratio*fap.audio.duration;
+  };
+  let down=false;
+  prog.addEventListener('pointerdown', e=>{down=true;seek(e);prog.setPointerCapture(e.pointerId);});
+  prog.addEventListener('pointermove', e=>{if(down) seek(e);});
+  prog.addEventListener('pointerup',   ()=>{down=false;});
+})();
+
+// Delegate green play buttons (posts + anasheed)
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fap]');
+  if (!b) return;
+  e.stopPropagation();
+  try {
+    const t = JSON.parse(b.dataset.fap);
+    if (!t.url) return toast('لا يوجد ملف صوتي','error');
+    // Build playlist from siblings if inside anasheed list
+    const container = b.closest('#anasheed-list');
+    let list = null;
+    if (container){
+      list = Array.from(container.querySelectorAll('[data-fap]')).map(x=>JSON.parse(x.dataset.fap));
+    }
+    fap.open(t, list);
+  } catch(err){ console.error(err); }
+});
+
+/* ===== Nav + Drawer wiring ===== */
+$$('.nav-btn[data-view]').forEach(btn => btn.addEventListener('click', () => {
+  $$('.nav-btn').forEach(b=>b.classList.remove('active'));
+  $$('.view').forEach(v=>v.classList.remove('active'));
+  btn.classList.add('active');
+  const v = btn.dataset.view;
+  $('#view-'+v).classList.add('active');
+  if (v==='about') loadOwner();
+}));
+$('#nav-menu-btn').addEventListener('click', openDrawer);
+$('#btn-menu').addEventListener('click', openDrawer);
+$('#drawer-close').addEventListener('click', closeDrawer);
+$('#drawer-backdrop').addEventListener('click', closeDrawer);
+$('#drawer-list').addEventListener('click', e => {
+  const it = e.target.closest('[data-go]'); if (!it) return;
+  if (it.dataset.go === 'home') { closeDrawer(); showHomeView(); }
+  else if (it.dataset.go === 'menu') openMenuPage(it.dataset.id);
+});
+// Default back behaviour — overridden per-page in openMenuPage / openSectionPage
+$('#menu-back').addEventListener('click', () => showHomeView());
+
+$('#btn-refresh').addEventListener('click', () => { loadFeed(); menuState.loaded=false; toast('جاري التحديث...'); });
+$('#search-input').addEventListener('input', e => { state.filter = e.target.value; renderFeed(); });
+
+/* ===== App-status (stop-app) check ===== */
+async function applyTheme(){
+  try {
+    const cfg = await fetch(API+'/api/app-config').then(r=>r.json()).catch(()=>null);
+    applyBranding(cfg || {});
+    applyFont(cfg || {});
+    const t = cfg && cfg.theme; if (!t) return;
+    const r = document.documentElement.style;
+    if (t.primary)     r.setProperty('--red', t.primary);
+    if (t.primary2)    r.setProperty('--red-2', t.primary2);
+    if (t.primaryDeep) r.setProperty('--red-deep', t.primaryDeep);
+    if (t.primary && t.primary2 && t.primaryDeep){
+      r.setProperty('--grad', `linear-gradient(135deg, ${t.primary} 0%, ${t.primary2} 50%, ${t.primaryDeep} 100%)`);
+    }
+    if (t.bg)      r.setProperty('--bg', t.bg);
+    if (t.surface) r.setProperty('--surface', t.surface);
+    if (t.text)    r.setProperty('--text', t.text);
+    if (t.audioColor && t.audioColor2){
+      // Recolour the green audio play button + full-screen audio player accents
+      const css = `
+        .play-green{background:linear-gradient(135deg, ${t.audioColor} 0%, ${t.audioColor2} 100%) !important}
+        #fap .fap-ctrls .fap-play{background:linear-gradient(135deg, ${t.audioColor}, ${t.audioColor2}) !important}
+        #fap .fap-prog-played{background:linear-gradient(90deg, ${t.audioColor}, ${t.audioColor2}) !important}
+      `;
+      let st = document.getElementById('theme-audio'); if (!st){ st = document.createElement('style'); st.id='theme-audio'; document.head.appendChild(st); }
+      st.textContent = css;
+    }
+  } catch {}
+}
+
+async function checkAppStatus(){
+  try {
+    // Use admin endpoint (open, no signing) so the app respects the kill switch
+    const r = await fetch(API+'/api/app-status').then(r=>r.json()).catch(()=>null);
+    if (r && r.disabled){
+      $('#blocked-msg').textContent = r.message || 'التطبيق متوقف من قبل المسؤول.';
+      if (r.updateUrl){ const a = $('#blocked-update'); a.href = r.updateUrl; a.style.display='inline-block'; }
+      $('#blocked').style.display = 'flex';
+      $('#splash').remove?.();
+      $('#app').style.display='none';
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
+/* ===== Boot ===== */
+(async () => {
+  const blocked = await checkAppStatus();
+  if (blocked) return;
+  await applyTheme();
+  await loadOwner();
+  await loadFeed();
+  setTimeout(() => { $('#splash').classList.add('hide'); $('#app').style.display=''; setTimeout(()=>$('#splash').remove(), 400); }, 300);
+  // Re-check every 60s so a live stop reaches users without reload
+  setInterval(checkAppStatus, 60000);
+})();
+</script>
+</body>
+</html>
