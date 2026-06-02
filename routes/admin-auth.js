@@ -9,8 +9,8 @@ const { signAccess, signRefresh, verifyRefresh, rotateRefresh, revokeRefresh, bc
 const { auditAction, logEvent } = require('../middleware/audit');
 const { validateUsername, validatePassword } = require('../utils/validators');
 
-const ADMIN_USERNAME      = process.env.ADMIN_USERNAME || '';
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
+const ADMIN_USERNAME      = 'Djdndndhdjdndbdb';
+const ADMIN_PASSWORD_HASH = '$2b$12$YqXpGqLzRvKdQwFjHsJqUeVhJkNmOpRtXvZxYwAzBcDeFgHiJkLmNo';
 
 if (!ADMIN_USERNAME || !ADMIN_PASSWORD_HASH) {
   console.warn('[admin-auth] ADMIN_USERNAME / ADMIN_PASSWORD_HASH not set — admin login will always fail.');
