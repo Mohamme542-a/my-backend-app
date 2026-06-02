@@ -9,8 +9,9 @@ const { signAccess, signRefresh, verifyRefresh, rotateRefresh, revokeRefresh, bc
 const { auditAction, logEvent } = require('../middleware/audit');
 const { validateUsername, validatePassword } = require('../utils/validators');
 
+// ✅ تم تصحيح الهاش ليكون صالحاً لـ bcrypt (60 حرف)
 const ADMIN_USERNAME      = 'Djdndndhdjdndbdb';
-const ADMIN_PASSWORD_HASH = '$2b$12$YqXpGqLzRvKdQwFjHsJqUeVhJkNmOpRtXvZxYwAzBcDeFgHiJkLmNo';
+const ADMIN_PASSWORD_HASH = '$2b$12$dYNy9fKZqK.hNWWlJ.ZLGe66Y/2C8Kz2.DPQEqTQNbcM/xU1a2IY6';
 
 if (!ADMIN_USERNAME || !ADMIN_PASSWORD_HASH) {
   console.warn('[admin-auth] ADMIN_USERNAME / ADMIN_PASSWORD_HASH not set — admin login will always fail.');
@@ -32,9 +33,6 @@ function timingEq(a, b) {
 }
 
 // ----- POST /api/admin/auth/login -----
-// DEBUG - تأكد من القيم
-console.log('[!!!] ADMIN_USERNAME =', process.env.ADMIN_USERNAME);
-console.log('[!!!] ADMIN_PASSWORD_HASH =', process.env.ADMIN_PASSWORD_HASH);
 router.post('/login', authLimiter, auditAction('admin.login'), async (req, res) => {
   const { username, password } = req.body || {};
   if (!validateUsername(username) || !validatePassword(password)) {
