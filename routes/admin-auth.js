@@ -32,6 +32,9 @@ function timingEq(a, b) {
 }
 
 // ----- POST /api/admin/auth/login -----
+// DEBUG - تأكد من القيم
+console.log('[!!!] ADMIN_USERNAME =', process.env.ADMIN_USERNAME);
+console.log('[!!!] ADMIN_PASSWORD_HASH =', process.env.ADMIN_PASSWORD_HASH);
 router.post('/login', authLimiter, auditAction('admin.login'), async (req, res) => {
   const { username, password } = req.body || {};
   if (!validateUsername(username) || !validatePassword(password)) {
