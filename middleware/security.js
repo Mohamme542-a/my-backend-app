@@ -45,7 +45,7 @@ const helmetMw = helmet({
       'media-src': ["'self'", 'blob:', 'https:'],
       'connect-src': ["'self'", 'https:', 'wss:'],
       'font-src': ["'self'", 'data:', 'https:'],
-      'script-src': ["'self'", "'strict-dynamic'", "'unsafe-inline'"],
+      'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https:', 'data:'],
       'style-src': ["'self'", "'unsafe-inline'", 'https:'],
       'upgrade-insecure-requests': [],
     },
