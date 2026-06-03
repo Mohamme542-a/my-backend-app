@@ -115,7 +115,7 @@ app.use('/api/admin', adminApi);
 app.use('/api', publicApi);
 
 // Server-side admin page protection (MUST be before static)
-app.use(protectAdminPages);
+// app.use(protectAdminPages);  // معطل مؤقتاً للاختبار
 
 // Static frontend (admin-login.html, index.html, etc.)
 app.use(express.static(path.join(__dirname, 'public'), {
