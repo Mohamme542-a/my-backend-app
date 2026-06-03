@@ -377,7 +377,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 
 <script>
 /* ============================================================
-   أثير — Admin v3.0
+   أثير — Admin v4.1 (Fixed Authentication)
    ============================================================ */
  const API = (window.__API__ || location.origin).replace(/\/+$/,'');
 
@@ -393,9 +393,19 @@ function toast(msg, kind){
   clearTimeout(t._t); t._t = setTimeout(()=>t.className='', 2500);
 }
 
-/* ===== JWT + CSRF auth bootstrap ===== */
-function getAccess(){ return localStorage.getItem('admin_access') || ''; }
-function setAccess(t){ if (t) localStorage.setItem('admin_access', t); else localStorage.removeItem('admin_access'); }
+/* ===== JWT + CSRF auth bootstrap (FIXED) ===== */
+function getAccess(){ 
+  return localStorage.getItem('admin_access') || sessionStorage.getItem('admin_access') || ''; 
+}
+function setAccess(t){ 
+  if (t) { 
+    localStorage.setItem('admin_access', t); 
+    sessionStorage.setItem('admin_access', t); 
+  } else { 
+    localStorage.removeItem('admin_access'); 
+    sessionStorage.removeItem('admin_access'); 
+  } 
+}
 function getCsrf(){ return sessionStorage.getItem('admin_csrf') || ''; }
 function setCsrf(t){ if (t) sessionStorage.setItem('admin_csrf', t); }
 
@@ -405,61 +415,117 @@ async function bootstrapCsrf(){
     const j = await r.json(); if (j && j.csrfToken) setCsrf(j.csrfToken);
   } catch {}
 }
+
 async function tryRefresh(){
+  const token = getAccess();
+  if (!token) return false;
   try {
     const r = await fetch(API+'/api/admin/auth/refresh', {
-      method:'POST', credentials:'include', headers:{ 'X-CSRF-Token': getCsrf() },
+      method:'POST', 
+      credentials:'include', 
+      headers: { 
+        'Authorization': 'Bearer ' + token,
+        'X-CSRF-Token': getCsrf() 
+      },
     });
     if (!r.ok) return false;
     const j = await r.json();
-    if (j && j.accessToken){ setAccess(j.accessToken); return true; }
+    if (j && j.accessToken){ 
+      setAccess(j.accessToken); 
+      if (j.csrfToken) setCsrf(j.csrfToken);
+      return true; 
+    }
     return false;
   } catch { return false; }
 }
-function goLogin(){ setAccess(''); location.replace('/admin-login.html'); }
-// تأخير التحقق قليلاً لانتظار تحميل localStorage
-setTimeout(() => {
-    if (!getAccess()) { goLogin(); }
-}, 100);
 
-async function api(path, opts={}){
-  const method = opts.method || 'GET';
-  const headers = {};
-  if (opts.body) headers['content-type'] = 'application/json';
-  const token = getAccess(); if (token) headers['authorization'] = 'Bearer ' + token;
-  if (method !== 'GET' && method !== 'HEAD') headers['x-csrf-token'] = getCsrf();
-  const doFetch = () => fetch(API+path, {
-    method, headers, credentials:'include',
-    body: opts.body ? JSON.stringify(opts.body) : undefined, cache:'no-store',
-  });
-  let r = await doFetch();
-  if (r.status === 401) {
-    const ok = await tryRefresh();
-    if (!ok) { goLogin(); throw new Error('401'); }
-    headers['authorization'] = 'Bearer ' + getAccess();
-    r = await doFetch();
-    if (r.status === 401) { goLogin(); throw new Error('401'); }
-  }
-  if (r.status === 403) {
-    await bootstrapCsrf(); headers['x-csrf-token'] = getCsrf();
-    r = await doFetch();
-  }
-  if (!r.ok) {
-    let err = ''; try { err = (await r.json()).error||''; } catch{}
-    throw new Error(`${r.status} ${err}`);
-  }
-  return r.json();
+function goLogin(){ 
+  setAccess(''); 
+  location.replace('/admin-login.html'); 
 }
 
-/* ===== Health + session verification ===== */
+// Enhanced token validation
+async function validateToken(token) {
+  if (!token) return false;
+  try {
+    const res = await fetch(API + '/api/admin/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    return res.status === 200;
+  } catch {
+    return false;
+  }
+}
+
+// Check token on load with retry
 (async () => {
   await bootstrapCsrf();
-  try { await api('/api/admin/auth/me'); } catch { goLogin(); return; }
-  const apiUrlEl = $('#api-url'); if (apiUrlEl) apiUrlEl.textContent = API.replace(/^https?:\/\//,'');
+  
+  // Small delay to ensure localStorage is ready
+  await new Promise(r => setTimeout(r, 50));
+  
+  let token = getAccess();
+  if (!token) {
+    goLogin();
+    return;
+  }
+  
+  const isValid = await validateToken(token);
+  if (!isValid) {
+    // Try to refresh
+    const refreshed = await tryRefresh();
+    if (!refreshed) {
+      goLogin();
+      return;
+    }
+  }
+  
+  // Token is valid, continue
+  const apiUrlEl = $('#api-url'); 
+  if (apiUrlEl) apiUrlEl.textContent = API.replace(/^https?:\/\//,'');
   fetch(API+'/healthz').then(r=>r.json())
     .then(()=>{ const s=$('#api-status'); if (s){ s.className='ok'; s.textContent='● متصل'; } })
     .catch(()=>{ const s=$('#api-status'); if (s) s.textContent='● منقطع'; });
 })();
+
+/* ===== API wrapper with automatic token handling ===== */
+async function api(path, opts={}){
+  const method = opts.method || 'GET';
+  const headers = {};
+  if (opts.body) headers['content-type'] = 'application/json';
+  let token = getAccess();
+  if (token) headers['authorization'] = 'Bearer ' + token;
+  if (method !== 'GET' && method !== 'HEAD') headers['x-csrf-token'] = getCsrf();
+  
+  const doFetch = () => fetch(API+path, {
+    method, headers, credentials:'include',
+    body: opts.body ? JSON.stringify(opts.body) : undefined, cache:'no-store',
+  });
+  
+  let r = await doFetch();
+  
+  if (r.status === 401) {
+    const ok = await tryRefresh();
+    if (!ok) { goLogin(); throw new Error('401'); }
+    token = getAccess();
+    if (token) headers['authorization'] = 'Bearer ' + token;
+    r = await doFetch();
+    if (r.status === 401) { goLogin(); throw new Error('401'); }
+  }
+  
+  if (r.status === 403) {
+    await bootstrapCsrf();
+    headers['x-csrf-token'] = getCsrf();
+    r = await doFetch();
+  }
+  
+  if (!r.ok) {
+    let err = ''; 
+    try { err = (await r.json()).error || ''; } catch {}
+    throw new Error(`${r.status} ${err}`);
+  }
+  return r.json();
+}
 
 /* ===== Tabs ===== */
 $$('.tab').forEach(t => t.addEventListener('click', () => {
@@ -494,7 +560,7 @@ async function loadStats(){
 }
 
 /* ============================================================
-   MEDIA UPLOAD (Cloudinary unsigned)
+   MEDIA UPLOAD (Cloudinary signed)
    ============================================================ */
 function detectKind(file){
   const m = file.type || '';
@@ -504,8 +570,7 @@ function detectKind(file){
   if (m === 'application/pdf' || /\.pdf$/i.test(file.name)) return 'pdf';
   return 'text';
 }
-// Signed Cloudinary upload — the server signs each upload; the browser never
-// sees the API secret and cannot tamper with folder/resource_type.
+
 async function uploadFile(file, onProgress){
   const kind = detectKind(file);
   const resource_type = (kind === 'image') ? 'image'
@@ -542,11 +607,9 @@ async function uploadFile(file, onProgress){
   });
 }
 
-/* ============================================================
-   POST FORM — Media chips
-   ============================================================ */
+/* ===== POST FORM — Media chips ===== */
 let editingId = null;
-const mediaList = []; // {type,url,caption,poster,width,height,duration,size}
+const mediaList = [];
 
 function renderChips(){
   const c = $('#media-chips');
@@ -572,6 +635,7 @@ function renderChips(){
     </div>`;
   }).join('');
 }
+
 $('#media-chips').addEventListener('click', e => {
   const up = e.target.closest('[data-up]'); const dn = e.target.closest('[data-dn]'); const rm = e.target.closest('[data-rm]');
   if (up) { const i=+up.dataset.up; [mediaList[i-1],mediaList[i]]=[mediaList[i],mediaList[i-1]]; renderChips(); }
@@ -582,7 +646,7 @@ $('#media-chips').addEventListener('input', e => {
   const cap = e.target.closest('[data-cap]'); if (!cap) return;
   mediaList[+cap.dataset.cap].caption = cap.value;
 });
-// Drag reorder
+
 let dragI = null;
 $('#media-chips').addEventListener('dragstart', e => { const ch=e.target.closest('.chip'); if(!ch) return; dragI=+ch.dataset.i; ch.classList.add('dragging'); });
 $('#media-chips').addEventListener('dragend',   e => { const ch=e.target.closest('.chip'); if(ch) ch.classList.remove('dragging'); });
@@ -606,8 +670,6 @@ drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('
 async function handleFiles(files){
   const upList = $('#up-list');
   for (const file of Array.from(files)) {
-    // Size limit removed by request — large files (long videos, big PDFs)
-    // go straight to Cloudinary; the backend never sees the bytes.
     const row = document.createElement('div'); row.className = 'up-item';
     row.innerHTML = `<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
     upList.appendChild(row);
@@ -632,6 +694,7 @@ $('#p-url-add').addEventListener('click', () => {
   mediaList.push({ type:t, url, caption:'' });
   $('#p-url').value=''; $('#p-utype').value=''; renderChips();
 });
+
 function detectByExt(u){
   try { const ext=new URL(u).pathname.toLowerCase().split('.').pop();
     if (['mp4','mov','m4v','webm','mkv','m3u8','ogv'].includes(ext)) return 'video';
@@ -642,7 +705,6 @@ function detectByExt(u){
   return 'text';
 }
 
-/* ===== Save/Edit/Reset Post ===== */
 function readPostForm(){
   return {
     title:    $('#p-title').value.trim(),
@@ -657,6 +719,7 @@ function readPostForm(){
     media:    mediaList.slice(),
   };
 }
+
 function resetForm(){
   editingId = null;
   $('#post-form-title').textContent = 'منشور جديد';
@@ -701,7 +764,6 @@ $('#p-preview').addEventListener('click', () => {
 });
 $('#preview-modal').addEventListener('click', e => { if (e.target.id==='preview-modal') e.currentTarget.classList.remove('show'); });
 
-/* ===== Posts list ===== */
 let allPosts = [];
 async function loadPosts(){
   try {
@@ -710,6 +772,7 @@ async function loadPosts(){
     renderPostList();
   } catch(e) { toast('تعذر التحميل', 'err'); }
 }
+
 function renderPostList(){
   const q = $('#posts-search').value.trim().toLowerCase();
   const list = q ? allPosts.filter(p => (p.title||'').toLowerCase().includes(q) || (p.tags||[]).some(t=>String(t).toLowerCase().includes(q))) : allPosts;
@@ -762,9 +825,6 @@ $('#posts-list').addEventListener('click', async e => {
   }
 });
 
-/* ============================================================
-   MEDIA LIBRARY
-   ============================================================ */
 function renderMediaLib(){
   const all = [];
   allPosts.forEach(p => (p.media||[]).forEach(m => all.push({...m, _post:p})));
@@ -777,11 +837,10 @@ function renderMediaLib(){
   }).join('');
 }
 
-/* ============================================================
-   SECTIONS / ANASHEED / CONFIG
-   ============================================================ */
+/* ===== SECTIONS / ANASHEED / CONFIG (unchanged) ===== */
 let editSecId = null;
 const sMediaList = [];
+
 function renderSChips(){
   const c = $('#s-media-chips'); if(!c) return;
   if (!sMediaList.length){ c.innerHTML='<p class="muted" style="text-align:center;padding:10px">لا توجد وسائط</p>'; return; }
@@ -793,12 +852,14 @@ function renderSChips(){
       <div class="acts"><button data-sup="${i}" ${i===0?'disabled':''}>▲</button><button data-sdn="${i}" ${i===sMediaList.length-1?'disabled':''}>▼</button><button data-srm="${i}">✕</button></div></div>`;
   }).join('');
 }
+
 document.addEventListener('click', e=>{
   const up=e.target.closest('[data-sup]'),dn=e.target.closest('[data-sdn]'),rm=e.target.closest('[data-srm]');
   if(up){const i=+up.dataset.sup;[sMediaList[i-1],sMediaList[i]]=[sMediaList[i],sMediaList[i-1]];renderSChips();}
   else if(dn){const i=+dn.dataset.sdn;[sMediaList[i+1],sMediaList[i]]=[sMediaList[i],sMediaList[i+1]];renderSChips();}
   else if(rm){sMediaList.splice(+rm.dataset.srm,1);renderSChips();}
 });
+
 document.addEventListener('input', e=>{ const c=e.target.closest('[data-scap]'); if(c) sMediaList[+c.dataset.scap].caption=c.value; });
 
 (()=>{
@@ -809,10 +870,10 @@ document.addEventListener('input', e=>{ const c=e.target.closest('[data-scap]');
   drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
   drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');sHandleFiles(e.dataTransfer.files);});
 })();
+
 async function sHandleFiles(files){
   const list=$('#s-up-list');
   for(const file of Array.from(files)){
-    // Size limit removed by request.
     const row=document.createElement('div');row.className='up-item';
     row.innerHTML=`<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
     list.appendChild(row);const bar=row.querySelector('.up-bar > div');
@@ -822,15 +883,18 @@ async function sHandleFiles(files){
     }catch{row.classList.add('err');toast('فشل رفع '+file.name,'err');}
   }
 }
+
 $('#s-url-add')?.addEventListener('click',()=>{
   const u=$('#s-url').value.trim(); if(!u) return;
   sMediaList.push({type:$('#s-utype').value||detectByExt(u),url:u,caption:''});
   $('#s-url').value='';$('#s-utype').value='';renderSChips();
 });
+
 function resetSecForm(){
   editSecId=null; ['s-name','s-img','s-desc'].forEach(id=>$('#'+id).value=''); $('#s-menu').value=''; $('#s-pinned').checked=false; $('#s-hidden').checked=false; sMediaList.length=0; renderSChips();
 }
 $('#s-reset')?.addEventListener('click', resetSecForm);
+
 $('#s-save').addEventListener('click', async () => {
   const body = { name:$('#s-name').value.trim(), imageUrl:$('#s-img').value.trim(), description:$('#s-desc').value, menuId:$('#s-menu').value||null, pinned:$('#s-pinned').checked, hidden:$('#s-hidden').checked, media:sMediaList.slice() };
   if (!body.name) return toast('الاسم مطلوب','err');
@@ -847,6 +911,7 @@ async function refreshMenuSelect(){
     sel.innerHTML='<option value="">— بدون —</option>'+items.map(m=>`<option value="${esc(m.id)}">${esc(m.label||'')}</option>`).join('');
   }catch{}
 }
+
 async function loadSections(){
   try {
     await refreshMenuSelect();
@@ -874,7 +939,6 @@ async function loadSections(){
   } catch{}
 }
 
-/* ===== Side menus CRUD ===== */
 let editMenuId=null;
 function resetMenuForm(){ editMenuId=null; ['m-label','m-icon','m-order'].forEach(id=>$('#'+id).value=''); $('#m-hidden').checked=false; $('#menu-form-title').textContent='قائمة جانبية جديدة'; }
 $('#m-reset')?.addEventListener('click', resetMenuForm);
@@ -887,6 +951,7 @@ $('#m-save')?.addEventListener('click', async ()=>{
     resetMenuForm(); loadMenus(); toast('تم','ok');
   }catch(e){ toast('فشل: '+e.message,'err'); }
 });
+
 async function loadMenus(){
   try{
     const { items } = await api('/api/admin/side-menu');
@@ -923,6 +988,7 @@ $('#a-save').addEventListener('click', async () => {
     loadAnasheed(); toast('تم','ok');
   } catch{ toast('فشل','err'); }
 });
+
 $('#a-bcast-now').addEventListener('click', async () => {
   const cover = $('#a-cover').value.trim();
   if (!cover) return toast('ضع رابط صورة في حقل الغلاف أولاً','err');
@@ -930,6 +996,7 @@ $('#a-bcast-now').addEventListener('click', async () => {
   try { const r=await api('/api/admin/anasheed/broadcast-cover',{method:'POST',body:{coverUrl:cover}}); toast('تم تحديث '+(r.updated||0)+' نشيد','ok'); loadAnasheed(); }
   catch{ toast('فشل','err'); }
 });
+
 $('#a-bcast-sec')?.addEventListener('click', async () => {
   const cover = $('#a-cover').value.trim();
   const sectionId = $('#a-section').value;
@@ -942,9 +1009,10 @@ $('#a-bcast-sec')?.addEventListener('click', async () => {
     loadAnasheed(); loadSections();
   } catch { toast('فشل','err'); }
 });
+
 async function loadAnasheed(){
   try {
-    const [{ items }, secRes] = await Promise.all([api('/api/admin/data'), api('/api/admin/sections').catch(()=>({items:[]}))]);
+    const [{ items }, secRes] = await Promise.all([api('/api/admin/anasheed'), api('/api/admin/sections').catch(()=>({items:[]}))]);
     const secs = secRes.items||[];
     const secMap = Object.fromEntries(secs.map(s=>[s.id,s.name]));
     $('#a-section').innerHTML = '<option value="">— بدون قسم —</option>' + secs.map(s=>`<option value="${esc(s.id)}">${esc(s.name||'قسم')}</option>`).join('');
@@ -982,6 +1050,7 @@ async function loadConfig(){
     $('#st-dis').checked=!!st.disabled; $('#st-msg').value=st.message||''; $('#st-ver').value=st.version||''; $('#st-url').value=st.updateUrl||'';
   } catch{}
 }
+
 $('#c-save').addEventListener('click', async () => {
   try {
     await api('/api/admin/app-config', { method:'POST', body:{
@@ -998,6 +1067,7 @@ $('#c-save').addEventListener('click', async () => {
     toast('تم الحفظ','ok');
   } catch{ toast('فشل','err'); }
 });
+
 $('#st-save').addEventListener('click', async () => {
   try {
     await api('/api/admin/app-status', { method:'POST', body:{
@@ -1008,7 +1078,11 @@ $('#st-save').addEventListener('click', async () => {
 });
 
 /* Boot */
-(async () => { renderChips(); await loadStats(); await loadPosts(); })();
+(async () => { 
+  renderChips(); 
+  await loadStats(); 
+  await loadPosts(); 
+})();
 </script>
 </body>
 </html>
