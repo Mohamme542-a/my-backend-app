@@ -417,7 +417,10 @@ async function tryRefresh(){
   } catch { return false; }
 }
 function goLogin(){ setAccess(''); location.replace('/admin-login.html'); }
-if (!getAccess()) { goLogin(); }
+// تأخير التحقق قليلاً لانتظار تحميل localStorage
+setTimeout(() => {
+    if (!getAccess()) { goLogin(); }
+}, 100);
 
 async function api(path, opts={}){
   const method = opts.method || 'GET';
