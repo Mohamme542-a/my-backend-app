@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
 <meta name="theme-color" content="#07070a"/>
-<title>أثـيـر — منصة وسائط</title>
+<title>الأنصار — منصة وسائط</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -45,11 +45,16 @@ body::before{content:"";position:fixed;inset:0;background:
 #drawer-backdrop.show{opacity:1;pointer-events:auto}
 #drawer{position:fixed;top:0;bottom:0;right:0;width:min(86vw,360px);z-index:130;
   background:linear-gradient(180deg,#1c1c22 0%,#15151c 60%,#0c0c12 100%);
-  border-left:1px solid rgba(255,255,255,.06);
+  border-left:1px solid rgba(255,255,255,.10);
   transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
   display:flex;flex-direction:column;padding-top:var(--safe-top);
-  box-shadow: -30px 0 80px rgba(0,0,0,.85), -8px 0 20px rgba(0,0,0,.6), inset 1px 0 0 rgba(255,255,255,.04);
-  border-left:1px solid rgba(255,255,255,.08);}
+  box-shadow:
+    -40px 0 120px rgba(0,0,0,.95),
+    -20px 0 60px rgba(0,0,0,.75),
+    -8px 0 20px rgba(0,0,0,.55),
+    -2px 0 6px rgba(239,43,61,.10),
+    inset 1px 0 0 rgba(255,255,255,.06),
+    inset 0 1px 0 rgba(255,255,255,.04);}
 #drawer.show{transform:translateX(0)}
 .drawer-head{padding:18px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
 .drawer-head .dh-title{font-family:'Amiri',serif;font-size:26px;background:var(--silver-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(255,255,255,.15))}
@@ -470,12 +475,76 @@ const FONT_PRESETS = {
   default: "'Tajawal', system-ui, sans-serif",
 };
 
+/* Detect well-known platforms and return an embeddable iframe URL.
+   Returns '' if the URL is a regular direct media file. */
+function getEmbedSrc(url){
+  const raw = String(url || '').trim();
+  if (!raw) return '';
+  try {
+    const u = new URL(raw, location.origin);
+    const host = u.hostname.replace(/^www\./i,'').toLowerCase();
+    // YouTube
+    if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com'){
+      const id = u.searchParams.get('v');
+      if (id) return `https://www.youtube.com/embed/${id}`;
+      const m = u.pathname.match(/^\/(embed|shorts|live|v)\/([^/?#]+)/);
+      if (m) return `https://www.youtube.com/embed/${m[2]}`;
+    }
+    if (host === 'youtu.be'){
+      const id = u.pathname.replace(/^\//,'').split(/[/?#]/)[0];
+      if (id) return `https://www.youtube.com/embed/${id}`;
+    }
+    // Vimeo
+    if (host === 'vimeo.com'){
+      const seg = u.pathname.split('/').filter(Boolean);
+      const id = seg.find(s => /^\d+$/.test(s));
+      if (id) return `https://player.vimeo.com/video/${id}`;
+    }
+    if (host === 'player.vimeo.com') return raw;
+    // Facebook / fb.watch
+    if (host.endsWith('facebook.com') || host === 'fb.watch'){
+      return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(raw)}&show_text=0`;
+    }
+    // TikTok
+    if (host.endsWith('tiktok.com')){
+      const m = u.pathname.match(/\/video\/(\d+)/);
+      if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
+    }
+    // Dailymotion
+    if (host.endsWith('dailymotion.com')){
+      const m = u.pathname.match(/\/video\/([^/?#]+)/);
+      if (m) return `https://www.dailymotion.com/embed/video/${m[1]}`;
+    }
+    if (host === 'dai.ly'){
+      const id = u.pathname.replace(/^\//,'');
+      if (id) return `https://www.dailymotion.com/embed/video/${id}`;
+    }
+    // Archive.org details/embed pages -> embed player
+    if (host === 'archive.org' || host.endsWith('.archive.org')){
+      const m = u.pathname.match(/^\/(details|embed)\/([^/?#]+)/);
+      if (m) return `https://archive.org/embed/${m[2]}`;
+    }
+    // SoundCloud
+    if (host.endsWith('soundcloud.com')){
+      return `https://w.soundcloud.com/player/?url=${encodeURIComponent(raw)}&auto_play=false&visual=true&hide_related=true`;
+    }
+    // Twitch
+    if (host.endsWith('twitch.tv')){
+      const m = u.pathname.match(/\/videos\/(\d+)/);
+      if (m) return `https://player.twitch.tv/?video=${m[1]}&parent=${location.hostname||'localhost'}`;
+    }
+  } catch{}
+  return '';
+}
+
 function normalizeMediaUrl(url, meta={}){
   const src = String(url || '').trim();
   if (!src) return '';
   if (/^blob:/i.test(src)) return src;
   if (src.startsWith(API + '/api/stream')) return src;
   const type = String(meta.type || '').trim();
+  // Embeds (YouTube, Vimeo, archive.org details, ...) must NOT be proxied.
+  if (type === 'embed' || getEmbedSrc(src)) return src;
   const mime = String(meta.mime || '').trim();
   const proxied = new URL(API + '/api/stream');
   proxied.searchParams.set('u', src);
@@ -840,14 +909,20 @@ $('#pv-close').addEventListener('click', () => { pvEl.classList.remove('show'); 
    Post rendering
    ============================================================ */
 function detectType(url, hint){
+  // Well-known platforms (YouTube/Vimeo/Facebook/TikTok/archive.org details/...)
+  // win over a stale 'text' hint, so a URL pasted in admin still embeds.
+  const embedHit = getEmbedSrc(url);
   if (hint) {
     const normalizedHint = String(hint).toLowerCase();
+    if (normalizedHint === 'embed') return 'embed';
+    if (embedHit && (normalizedHint === 'text' || normalizedHint === '')) return 'embed';
     if (['video','audio','image','pdf','text'].includes(normalizedHint)) return normalizedHint;
     if (normalizedHint.startsWith('video/')) return 'video';
     if (normalizedHint.startsWith('audio/')) return 'audio';
     if (normalizedHint.startsWith('image/')) return 'image';
     if (normalizedHint.includes('pdf')) return 'pdf';
   }
+  if (embedHit) return 'embed';
   const u = String(url||'');
   try {
     const path = new URL(u, location.origin).pathname.toLowerCase();
@@ -870,6 +945,24 @@ function detectType(url, hint){
   if (/cloudinary.*\/video\/upload\//i.test(u)) return 'video';
   if (/cloudinary.*\/image\/upload\//i.test(u)) return 'image';
   return 'text';
+}
+
+/* Mount an iframe player for embeddable URLs (YouTube/Vimeo/Facebook/
+   TikTok/archive.org details/SoundCloud/...). */
+function mountEmbed(slotEl, rawUrl, opts={}){
+  const src = getEmbedSrc(rawUrl) || rawUrl;
+  const isAudio = /soundcloud\.com/i.test(rawUrl);
+  const wrap = document.createElement('div');
+  wrap.className = 'vp';
+  if (isAudio) wrap.style.aspectRatio = 'auto', wrap.style.height = '180px', wrap.style.background='#1d1d27';
+  wrap.innerHTML = `<iframe
+    src="${esc(src)}"
+    style="width:100%;height:100%;border:0;background:#000;display:block"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+    allowfullscreen
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+  slotEl.appendChild(wrap);
 }
 
 function renderPost(p){
@@ -903,6 +996,8 @@ function renderPost(p){
     }
     if (type === 'video') {
       mountVideoPlayer(slot, m.url, { poster: m.poster || m.thumb || p.coverUrl, mime: m.mime || '' });
+    } else if (type === 'embed') {
+      mountEmbed(slot, m.url);
     } else if (type === 'audio') {
       slot.classList.add('audio-card');
       const aid = 'a_'+Math.random().toString(36).slice(2,8);
@@ -1074,6 +1169,8 @@ function renderMediaSlot(m){
     slot.appendChild(wrap);
   } else if (type === 'video'){
     mountVideoPlayer(slot, m.url, { poster: m.poster || m.thumb, mime: m.mime || '' });
+  } else if (type === 'embed'){
+    mountEmbed(slot, m.url);
   } else if (type === 'audio'){
     slot.classList.add('audio-card');
     slot.innerHTML = `<div class="an-row" style="padding:6px 4px">
@@ -1174,15 +1271,21 @@ async function openSectionPage(sectionId, parentMenuId){
   const body = $('#menu-body');
   body.innerHTML = '';
   const media = Array.isArray(sec.media) ? sec.media.slice() : [];
-  // Append legacy anasheed attached to THIS section only
+  // Append "anasheed" items (now supports audio/video/image/pdf) for THIS section
   (menuState.anasheed||[])
     .filter(a => String(a.sectionId||'') === String(sec.id))
-    .forEach(a => media.push({
-      type: 'audio', url: a.audioUrl, caption: a.title || '',
-      poster: a.coverUrl || sec.imageUrl || '',
-      thumb:  a.coverUrl || sec.imageUrl || '',
-      _artist: a.artist || ''
-    }));
+    .forEach(a => {
+      const url = a.url || a.audioUrl || '';
+      const t   = a.type || detectType(url);
+      media.push({
+        type: t,
+        url,
+        caption: a.title || '',
+        poster: a.coverUrl || sec.imageUrl || '',
+        thumb:  a.coverUrl || sec.imageUrl || '',
+        _artist: a.artist || ''
+      });
+    });
   if (!media.length){
     body.innerHTML = '<div class="empty" style="padding:40px"><p>لا توجد ملفات في هذا القسم بعد</p></div>';
     return;
