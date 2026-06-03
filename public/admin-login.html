@@ -69,7 +69,7 @@
       // Store ONLY access token in memory (sessionStorage as fallback for reload)
       sessionStorage.setItem('admin_access', d.accessToken);
       sessionStorage.setItem('admin_csrf', csrf);
-      location.href = '/admin.html';
+      window.location.replace('/admin.html');
     } catch (e) {
       err.textContent = e.message === 'BAD_CREDENTIALS'
         ? 'بيانات الدخول غير صحيحة.'
