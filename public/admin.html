@@ -464,11 +464,26 @@ async function validateToken(token) {
   // Small delay to ensure localStorage is ready
   await new Promise(r => setTimeout(r, 50));
   
-  let token = getAccess();
-  if (!token) {
+  // تأخير بسيط والتحقق من صحة التوكن مع الخادم
+await new Promise(r => setTimeout(r, 100));
+let token = getAccess();
+if (!token) {
+  goLogin();
+  return;
+}
+try {
+  const res = await fetch(API + '/api/admin/auth/me', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (res.status !== 200) {
     goLogin();
     return;
   }
+} catch (e) {
+  console.error("خطأ في التحقق:", e);
+  goLogin();
+  return;
+                          }
   
   const isValid = await validateToken(token);
   if (!isValid) {
