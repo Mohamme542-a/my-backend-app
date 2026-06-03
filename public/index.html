@@ -47,7 +47,9 @@ body::before{content:"";position:fixed;inset:0;background:
   background:linear-gradient(180deg,#1c1c22 0%,#15151c 60%,#0c0c12 100%);
   border-left:1px solid rgba(255,255,255,.06);
   transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
-  display:flex;flex-direction:column;padding-top:var(--safe-top);box-shadow:-20px 0 60px rgba(0,0,0,.7)}
+  display:flex;flex-direction:column;padding-top:var(--safe-top);
+  box-shadow: -30px 0 80px rgba(0,0,0,.85), -8px 0 20px rgba(0,0,0,.6), inset 1px 0 0 rgba(255,255,255,.04);
+  border-left:1px solid rgba(255,255,255,.08);}
 #drawer.show{transform:translateX(0)}
 .drawer-head{padding:18px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
 .drawer-head .dh-title{font-family:'Amiri',serif;font-size:26px;background:var(--silver-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(255,255,255,.15))}
@@ -1404,8 +1406,19 @@ async function checkAppStatus(){
     // Use admin endpoint (open, no signing) so the app respects the kill switch
     const r = await fetch(API+'/api/app-status').then(r=>r.json()).catch(()=>null);
     if (r && r.disabled){
-      $('#blocked-msg').textContent = r.message || 'التطبيق متوقف من قبل المسؤول.';
-      if (r.updateUrl){ const a = $('#blocked-update'); a.href = r.updateUrl; a.style.display='inline-block'; }
+      const hasUpdate = !!r.updateUrl;
+      const defaultMsg = hasUpdate 
+        ? 'التطبيق متوقف من قبل المسؤول. يمكنك تحميل التحديث الجديد.'
+        : 'تم إيقاف التطبيق بسبب عطل فني. سيتم إصلاحه قريباً إن شاء الله. شكراً لصبركم.';
+      $('#blocked-msg').textContent = r.message || defaultMsg;
+      const updateBtn = $('#blocked-update');
+      if (hasUpdate){ 
+        updateBtn.href = r.updateUrl; 
+        updateBtn.style.display='inline-block'; 
+        updateBtn.textContent = 'تحميل التحديث';
+      } else {
+        updateBtn.style.display='none';
+      }
       $('#blocked').style.display = 'flex';
       $('#splash').remove?.();
       $('#app').style.display='none';
