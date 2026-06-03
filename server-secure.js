@@ -33,13 +33,25 @@ const publicApi = require('./routes/public');
 function protectAdminPages(req, res, next) {
   const url = req.path;
   if (url === '/admin.html' || url === '/admin' || url === '/admin/') {
+    // 1. التحقق من Authorization Header
+    let token = null;
     const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
-    if (m) {
+    if (m) token = m[1];
+    
+    // 2. التحقق من Query String (access_token)
+    if (!token && req.query.access_token) {
+      token = req.query.access_token;
+    }
+    
+    // 3. التحقق من الـ token
+    if (token) {
       try {
-        const p = jwt.verify(m[1], process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
+        const p = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
         if (p.role === 'admin') return next();
       } catch {}
     }
+    
+    // 4. التحقق من Refresh Cookie
     const refresh = req.signedCookies?.rt;
     if (refresh) {
       try {
