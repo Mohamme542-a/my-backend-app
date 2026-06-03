@@ -9,9 +9,9 @@ const { signAccess, signRefresh, verifyRefresh, rotateRefresh, revokeRefresh, bc
 const { auditAction, logEvent } = require('../middleware/audit');
 const { validateUsername, validatePassword } = require('../utils/validators');
 
-// ✅ بيانات تسجيل الدخول الثابتة (صالحة 100%)
-const ADMIN_USERNAME      = 'admin';
-const ADMIN_PASSWORD_HASH = '$2b$10$NkYpXqGqLzRvKdQwFjHsJqUeVhJkNmOpRtXvZxYwAzBcDeFgHiJkLmNo';
+// ✅ بيانات تسجيل الدخول - اسم مستخدم طويل + هاش صحيح
+const ADMIN_USERNAME      = 'Djdndndhdjdndbdb';
+const ADMIN_PASSWORD_HASH = '$2a$12$Rpsh69daceKkSQWJ66dX9O3RfcXxRIG6DAlT4jXYEz2nFd43a1zbe';
 
 const REFRESH_COOKIE = 'rt';
 const cookieOpts = () => ({
@@ -33,38 +33,34 @@ router.post('/login', authLimiter, auditAction('admin.login'), async (req, res) 
   const { username, password } = req.body || {};
   
   console.log('========================================');
-  console.log('[LOGIN ATTEMPT] Username:', username);
-  console.log('[LOGIN ATTEMPT] Password:', password);
-  console.log('[LOGIN ATTEMPT] Expected username:', ADMIN_USERNAME);
+  console.log('[LOGIN] Username:', username);
+  console.log('[LOGIN] Password length:', password?.length);
+  console.log('[LOGIN] Expected username:', ADMIN_USERNAME);
   console.log('========================================');
   
   if (!validateUsername(username) || !validatePassword(password)) {
-    console.log('[FAILED] Validation failed');
     logEvent('admin.login.invalid_input', req, { status: 400 });
     return res.status(400).json({ error: 'BAD_CREDENTIALS' });
   }
   
-  // مقارنة اسم المستخدم
   const userOk = ADMIN_USERNAME && timingEq(username, ADMIN_USERNAME);
   console.log('[CHECK] userOk:', userOk);
   
-  // مقارنة كلمة المرور باستخدام bcrypt
   let passOk = false;
   try {
     passOk = await bcryptCompare(password, ADMIN_PASSWORD_HASH);
     console.log('[CHECK] passOk:', passOk);
   } catch (err) {
-    console.log('[ERROR] bcryptCompare failed:', err.message);
+    console.log('[ERROR] bcryptCompare:', err.message);
   }
   
   if (!userOk || !passOk) {
-    console.log('[FAILED] Invalid credentials');
+    console.log('[FAILED] Invalid credentials ❌');
     logEvent('admin.login.failed', req, { status: 401, extra: { username } });
     return res.status(401).json({ error: 'BAD_CREDENTIALS' });
   }
   
-  console.log('[SUCCESS] Login successful for:', username);
-  
+  console.log('[SUCCESS] Login successful ✅');
   const payload = { sub: ADMIN_USERNAME, role: 'admin' };
   const access = signAccess(payload);
   const { token: refresh } = signRefresh(payload);
