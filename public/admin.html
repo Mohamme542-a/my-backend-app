@@ -394,8 +394,8 @@ function toast(msg, kind){
 }
 
 /* ===== JWT + CSRF auth bootstrap ===== */
-function getAccess(){ return sessionStorage.getItem('admin_access') || ''; }
-function setAccess(t){ if (t) sessionStorage.setItem('admin_access', t); else sessionStorage.removeItem('admin_access'); }
+function getAccess(){ return localStorage.getItem('admin_access') || ''; }
+function setAccess(t){ if (t) localStorage.setItem('admin_access', t); else localStorage.removeItem('admin_access'); }
 function getCsrf(){ return sessionStorage.getItem('admin_csrf') || ''; }
 function setCsrf(t){ if (t) sessionStorage.setItem('admin_csrf', t); }
 
