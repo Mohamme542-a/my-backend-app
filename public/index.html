@@ -315,6 +315,39 @@ main{padding:18px 14px;max-width:980px;margin:0 auto}
   .icon-btn{width:38px;height:38px}
   .nav-btn{font-size:10px}
 }
+
+/* ===== Mini persistent audio bar ===== */
+#mini-ap{position:fixed;left:0;right:0;bottom:calc(72px + var(--safe-bot));z-index:55;
+  display:none;padding:0 10px;pointer-events:none}
+#mini-ap.show{display:block}
+#mini-ap .mini-inner{pointer-events:auto;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#0f2419,#0a1a12);
+  border:1px solid rgba(74,222,128,.25);border-radius:14px;padding:8px 10px;
+  box-shadow:0 16px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04),0 -2px 8px rgba(34,197,94,.15)}
+#mini-ap .mini-cover{width:44px;height:44px;border-radius:10px;background:#0a2a18 center/cover;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+#mini-ap .mini-meta{flex:1;min-width:0;cursor:pointer}
+#mini-ap .mini-meta .mt{font-family:'Reem Kufi',sans-serif;font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mini-ap .mini-meta .ms{font-size:11px;color:#86efac;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mini-ap .mini-bar{position:absolute;left:10px;right:10px;bottom:0;height:2px;background:rgba(255,255,255,.08);border-radius:0 0 14px 14px;overflow:hidden}
+#mini-ap .mini-bar > div{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);width:0%}
+#mini-ap button{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer;transition:.15s}
+#mini-ap button:hover{background:rgba(255,255,255,.12)}
+#mini-ap button.mp{width:42px;height:42px;background:linear-gradient(135deg,#4ade80,#15803d);box-shadow:0 6px 18px rgba(34,197,94,.45)}
+#mini-ap button svg{width:18px;height:18px}
+#mini-ap button.mp svg{width:20px;height:20px}
+body.has-mini .bottom-nav{box-shadow:0 -8px 24px rgba(0,0,0,.4)}
+body.has-mini #app{padding-bottom:calc(160px + var(--safe-bot))}
+
+/* New fap control buttons */
+#fap .fap-ctrls .fap-extra{width:42px;height:42px}
+#fap-repeat.on{color:#4ade80;background:rgba(74,222,128,.18)}
+#fap-repeat.on svg{filter:drop-shadow(0 0 6px rgba(74,222,128,.7))}
+#fap .fap-secondary{display:flex;justify-content:center;gap:14px;margin-top:14px}
+#fap .fap-secondary button{background:rgba(255,255,255,.06);border:none;color:#fff;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:.15s}
+#fap .fap-secondary button:hover{background:rgba(255,255,255,.14)}
+#fap .fap-secondary button.on{color:#4ade80;background:rgba(74,222,128,.18)}
+#fap .fap-secondary button svg{width:20px;height:20px}
+
 </style>
 </head>
 <body>
@@ -417,6 +450,23 @@ main{padding:18px 14px;max-width:980px;margin:0 auto}
   <iframe id="pv-frame" allow="fullscreen"></iframe>
 </div>
 
+
+<!-- Persistent mini audio bar -->
+<div id="mini-ap" role="region" aria-label="مشغل مصغّر">
+  <div class="mini-inner">
+    <div class="mini-cover" id="mini-cover"></div>
+    <div class="mini-meta" id="mini-meta">
+      <div class="mt" id="mini-title">—</div>
+      <div class="ms" id="mini-artist"></div>
+    </div>
+    <button id="mini-prev" aria-label="السابق"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg></button>
+    <button class="mp" id="mini-play" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+    <button id="mini-next" aria-label="التالي"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+    <button id="mini-close" aria-label="إيقاف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <div class="mini-bar"><div id="mini-prog"></div></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- Full-screen audio player -->
@@ -440,9 +490,19 @@ main{padding:18px 14px;max-width:980px;margin:0 auto}
     <div class="fap-prog" id="fap-prog"><div class="fap-prog-played" id="fap-played"></div></div>
     <div class="fap-times"><span id="fap-cur">0:00</span><span id="fap-dur">0:00</span></div>
     <div class="fap-ctrls">
+      <button id="fap-prev" class="fap-extra" aria-label="السابق"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg></button>
       <button id="fap-back" aria-label="-10"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/></svg></button>
       <button class="fap-play" id="fap-play" aria-label="تشغيل"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
       <button id="fap-fwd" aria-label="+10"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 4v5h-5"/></svg></button>
+      <button id="fap-next" class="fap-extra" aria-label="التالي"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+    </div>
+    <div class="fap-secondary">
+      <button id="fap-repeat" aria-label="تكرار" title="تكرار النشيدة الحالية">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      </button>
+      <button id="fap-download" aria-label="تنزيل" title="تنزيل الأنشودة">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      </button>
     </div>
   </div>
 </div>
@@ -1115,7 +1175,7 @@ function renderFeed(){
 /* ============================================================
    Side menu (drawer) + Menu page
    ============================================================ */
-const menuState = { items: [], sections: [], anasheed: [], loaded: false };
+const menuState = window.__menuState = { items: [], sections: [], anasheed: [], loaded: false };
 
 async function loadMenuData(force){
   // Always refetch — admins push updates frequently and a stale cache makes
@@ -1276,6 +1336,8 @@ async function openSectionPage(sectionId, parentMenuId){
     .filter(a => String(a.sectionId||'') === String(sec.id))
     .forEach(a => {
       const url = a.url || a.audioUrl || '';
+      const _typ = a.type || 'audio';
+      if (_typ !== 'audio') { /* non-audio anasheed rendered via media pipeline */ a._nonAudio = true; }
       const t   = a.type || detectType(url);
       media.push({
         type: t,
@@ -1354,8 +1416,8 @@ const fap = {
       this.audio.addEventListener('timeupdate', () => this.tick());
       this.audio.addEventListener('loadedmetadata', () => this.tick());
       this.audio.addEventListener('ended', () => this.next());
-      this.audio.addEventListener('play',  () => { this.playing=true; this.setIcon(); $('#fap-cover').classList.add('spin'); this.startViz(); });
-      this.audio.addEventListener('pause', () => { this.playing=false; this.setIcon(); $('#fap-cover').classList.remove('spin'); });
+      this.audio.addEventListener('play',  () => { this.playing=true; this.setIcon(); this.syncMiniIcon(); $('#fap-cover').classList.add('spin'); this.startViz(); });
+      this.audio.addEventListener('pause', () => { this.playing=false; this.setIcon(); this.syncMiniIcon(); $('#fap-cover').classList.remove('spin'); });
       this.audio.addEventListener('error', () => toast('فشل تشغيل الأنشودة','error'));
     }
       this.audio.src = normalizeMediaUrl(t.url, { type:'audio' });
@@ -1363,6 +1425,7 @@ const fap = {
     $('#fap-artist').textContent = t.artist||'';
     $('#fap-cover').style.background = t.cover?`url('${t.cover}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)';
     this.audio.play().catch(()=>{});
+    this.updateMini();
   },
   setIcon(){
     $('#fap-play').innerHTML = this.playing
@@ -1376,8 +1439,53 @@ const fap = {
     $('#fap-cur').textContent = this.fmt(c);
     $('#fap-dur').textContent = this.fmt(d);
     $('#fap-played').style.transform = `scaleX(${d?c/d:0})`;
+    const mp = document.getElementById('mini-prog'); if (mp) mp.style.width = (d?(c/d)*100:0) + '%';
   },
-  next(){ if (this.idx < this.playlist.length-1) { this.idx++; this.load(this.playlist[this.idx]); } else this.audio.pause(); },
+  prev(){ if (this.idx > 0) { this.idx--; this.load(this.playlist[this.idx]); } else if (this.audio) { this.audio.currentTime = 0; } },
+  next(){
+    if (this.repeat && this.audio) { this.audio.currentTime = 0; this.audio.play().catch(()=>{}); return; }
+    if (this.idx < this.playlist.length-1) { this.idx++; this.load(this.playlist[this.idx]); }
+    else if (this.audio) { this.audio.pause(); }
+  },
+  toggleRepeat(){ this.repeat = !this.repeat; this.syncRepeatUI(); },
+  syncRepeatUI(){
+    const a = document.getElementById('fap-repeat'); if (a) a.classList.toggle('on', !!this.repeat);
+  },
+  download(){
+    const t = this.playlist[this.idx]; if (!t || !t.url) return;
+    try {
+      const a = document.createElement('a');
+      // Direct URL — let the browser stream/save it. normalizeMediaUrl proxies remote URLs so headers are correct.
+      a.href = normalizeMediaUrl(t.url, { type:'audio' });
+      a.download = (t.title || 'audio').replace(/[\\/:*?"<>|]+/g,'_');
+      a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); a.remove();
+      try { toast('بدأ التنزيل','success'); } catch(_){}
+    } catch(e){ try { toast('فشل التنزيل','error'); } catch(_){} }
+  },
+  minimize(){ this.el.classList.remove('show'); /* audio keeps playing; mini bar stays */ },
+  stop(){
+    this.el.classList.remove('show');
+    if (this.audio){ this.audio.pause(); this.audio.currentTime = 0; }
+    cancelAnimationFrame(this.raf);
+    const m = document.getElementById('mini-ap'); if (m) m.classList.remove('show');
+    document.body.classList.remove('has-mini');
+  },
+  updateMini(){
+    const t = this.playlist[this.idx]; if (!t) return;
+    const m = document.getElementById('mini-ap'); if (!m) return;
+    m.classList.add('show'); document.body.classList.add('has-mini');
+    document.getElementById('mini-title').textContent = t.title || '—';
+    document.getElementById('mini-artist').textContent = t.artist || '';
+    document.getElementById('mini-cover').style.background = t.cover ? `url('${t.cover}') center/cover` : 'linear-gradient(135deg,#22c55e,#15803d)';
+    this.syncMiniIcon();
+  },
+  syncMiniIcon(){
+    const b = document.getElementById('mini-play'); if (!b) return;
+    b.innerHTML = this.playing
+      ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  },
   startViz(){
     try {
       if (!this.ctx) this.ctx = new (window.AudioContext||window.webkitAudioContext)();
@@ -1409,7 +1517,7 @@ const fap = {
       draw();
     } catch(e){ console.warn('viz', e); }
   },
-  close(){ this.el.classList.remove('show'); if (this.audio) this.audio.pause(); cancelAnimationFrame(this.raf); }
+  close(){ this.minimize(); }
 };
 $('#fap-close').addEventListener('click', () => fap.close());
 $('#fap-play').addEventListener('click', () => { if (!fap.audio) return; fap.audio.paused?fap.audio.play():fap.audio.pause(); });
@@ -1430,6 +1538,29 @@ $('#fap-fwd').addEventListener('click',  () => { if (fap.audio) fap.audio.curren
   prog.addEventListener('pointerdown', e=>{down=true;seek(e);prog.setPointerCapture(e.pointerId);});
   prog.addEventListener('pointermove', e=>{if(down) seek(e);});
   prog.addEventListener('pointerup',   ()=>{down=false;});
+})();
+
+/* ===== New player controls: repeat / download / prev / next / mini ===== */
+(function(){
+  const $r = id => document.getElementById(id);
+  $r('fap-repeat')   && $r('fap-repeat').addEventListener('click', () => fap.toggleRepeat());
+  $r('fap-download') && $r('fap-download').addEventListener('click', (e) => { e.stopPropagation(); fap.download(); });
+  $r('fap-prev')     && $r('fap-prev').addEventListener('click', () => fap.prev());
+  $r('fap-next')     && $r('fap-next').addEventListener('click', () => fap.next());
+
+  // Mini bar interactions
+  $r('mini-play')  && $r('mini-play').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!fap.audio) return;
+    fap.audio.paused ? fap.audio.play() : fap.audio.pause();
+  });
+  $r('mini-prev')  && $r('mini-prev').addEventListener('click', (e) => { e.stopPropagation(); fap.prev(); });
+  $r('mini-next')  && $r('mini-next').addEventListener('click', (e) => { e.stopPropagation(); fap.next(); });
+  $r('mini-close') && $r('mini-close').addEventListener('click', (e) => { e.stopPropagation(); fap.stop(); });
+  // Tap meta = expand to full screen
+  $r('mini-meta')  && $r('mini-meta').addEventListener('click', () => {
+    if (fap.playlist.length) fap.el.classList.add('show');
+  });
 })();
 
 // Delegate green play buttons (posts + anasheed)
@@ -1470,6 +1601,7 @@ $('#drawer-list').addEventListener('click', e => {
 });
 // Default back behaviour — overridden per-page in openMenuPage / openSectionPage
 $('#menu-back').addEventListener('click', () => showHomeView());
+window.__menuState = (typeof menuState !== 'undefined') ? menuState : window.__menuState;
 
 $('#btn-refresh').addEventListener('click', () => { loadFeed(); menuState.loaded=false; toast('جاري التحديث...'); });
 $('#search-input').addEventListener('input', e => { state.filter = e.target.value; renderFeed(); });
@@ -1530,6 +1662,95 @@ async function checkAppStatus(){
   } catch {}
   return false;
 }
+
+
+/* ===== v4.2: render side-menu inline media items ===== */
+(function(){
+  // Periodic enhancement: when drawer renders, attach inline media list under each item.
+  function enhanceDrawer(){
+    const list = document.getElementById('drawer-list'); if (!list) return;
+    if (!window.__menuState || !window.__menuState.sideMenu) return;
+    window.__menuState.sideMenu.forEach(m => {
+      if (!Array.isArray(m.media) || !m.media.length) return;
+      const node = list.querySelector(`[data-go="menu"][data-id="${m.id}"]`);
+      if (!node || node.dataset.enhanced) return;
+      node.dataset.enhanced = '1';
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.04);padding:4px 0';
+      wrap.innerHTML = m.media.map((x,i) => {
+        const ic = ({video:'🎬',image:'🖼',audio:'🎵',pdf:'📄',embed:'🔗'})[x.type]||'•';
+        return `<button class="dm-item" data-menu-media="${m.id}|${i}" style="padding:10px 24px 10px 48px;font-size:13px;background:transparent;border:none;width:100%;text-align:right;display:flex;gap:10px;align-items:center;color:#c8c8d0;cursor:pointer">
+          <span style="width:22px;text-align:center">${ic}</span>
+          <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.caption||x.title||x.url||'بدون عنوان')}</span>
+        </button>`;
+      }).join('');
+      node.parentNode.insertBefore(wrap, node.nextSibling);
+    });
+  }
+  // Re-run after openDrawer paints
+  const _open = window.openDrawer;
+  if (typeof _open === 'function') {
+    window.openDrawer = function(){ const r = _open.apply(this, arguments); setTimeout(enhanceDrawer, 30); return r; };
+  } else {
+    // fallback: watch the drawer-list for changes
+    const o = new MutationObserver(()=>setTimeout(enhanceDrawer, 10));
+    document.addEventListener('DOMContentLoaded', () => {
+      const list = document.getElementById('drawer-list');
+      if (list) o.observe(list, { childList:true });
+    });
+  }
+
+  // Click handler for menu-media items
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-menu-media]'); if (!b) return;
+    const [mid, idx] = b.dataset.menuMedia.split('|');
+    const m = window.__menuState && window.__menuState.sideMenu && window.__menuState.sideMenu.find(x=>x.id===mid);
+    if (!m) return;
+    const item = (m.media||[])[+idx]; if (!item) return;
+    e.preventDefault(); e.stopPropagation();
+    playSideMenuItem(item);
+  });
+
+  // Universal play for a media item
+  window.playSideMenuItem = function(item){
+    const type = item.type || 'audio';
+    if (type === 'audio') {
+      // Open the persistent player (fap object already exists)
+      if (window.fap) fap.open({ url:item.url, title:item.caption||item.title||'تشغيل', artist:'', cover:item.cover||item.thumb||'' });
+      return;
+    }
+    if (type === 'image') {
+      const iv = document.getElementById('img-viewer'), img = document.getElementById('iv-img');
+      if (iv && img) { img.src = item.url; iv.classList.add('show'); }
+      return;
+    }
+    if (type === 'pdf') {
+      const pv = document.getElementById('pdf-viewer'), fr = document.getElementById('pv-frame'), dl = document.getElementById('pv-download');
+      if (pv && fr) { fr.src = normalizeMediaUrl(item.url, { type:'pdf', mime:item.mime||'application/pdf' }); if (dl) dl.href = item.url; pv.classList.add('show'); }
+      return;
+    }
+    if (type === 'video' || type === 'embed') {
+      const embed = getEmbedSrc(item.url);
+      // Open a quick lightbox-style overlay
+      let ov = document.getElementById('quick-vid');
+      if (!ov) {
+        ov = document.createElement('div'); ov.id='quick-vid';
+        ov.style.cssText='position:fixed;inset:0;z-index:340;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:14px';
+        ov.innerHTML='<button id="qv-close" style="position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:50%;background:#1d1d27;color:#fff;border:none;cursor:pointer">✕</button><div id="qv-body" style="width:100%;max-width:960px;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden"></div>';
+        document.body.appendChild(ov);
+        ov.addEventListener('click', e => { if (e.target.id==='quick-vid' || e.target.id==='qv-close') { ov.style.display='none'; document.getElementById('qv-body').innerHTML=''; } });
+      }
+      const body = document.getElementById('qv-body');
+      if (embed) {
+        body.innerHTML = `<iframe src="${esc(embed)}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%;height:100%;border:0"></iframe>`;
+      } else {
+        const src = normalizeMediaUrl(item.url, { type:'video', mime:item.mime||'video/mp4' });
+        body.innerHTML = `<video src="${esc(src)}" controls autoplay playsinline style="width:100%;height:100%;background:#000"></video>`;
+      }
+      ov.style.display='flex';
+    }
+  };
+})();
 
 /* ===== Boot ===== */
 (async () => {
