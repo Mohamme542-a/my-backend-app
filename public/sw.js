@@ -1,5 +1,5 @@
 /* Service Worker — cache static shell, network-first for API, bypass admin pages. */
-const VERSION   = 'atheer-v4.1';
+const VERSION   = 'atheer-v4.2';
 const STATIC    = `${VERSION}-static`;
 const RUNTIME   = `${VERSION}-runtime`;
 const PRECACHE  = ['/', '/index.html', '/js/api.js'];
