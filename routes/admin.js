@@ -59,6 +59,7 @@ router.post('/app-config', auditAction('config.update'), async (req, res) => {
           x:         sanitizeUrl(ol.x,         500),
         },
       },
+      font: sanitizeString(b.font, 60),
       theme: (() => {
         const t = b.theme || {};
         return {
@@ -260,12 +261,19 @@ router.get('/anasheed', async (_q, r) => {
 router.post('/anasheed', auditAction('anasheed.create'), async (req, res) => {
   try {
     const b = req.body || {};
-    if (!b.title || !b.audioUrl) return res.status(400).json({ error: 'TITLE_AND_AUDIO_REQUIRED' });
-    if (!isAllowedUrl(b.audioUrl)) return res.status(400).json({ error: 'BAD_AUDIO_URL' });
+    const mediaUrl = b.url || b.audioUrl;
+    if (!b.title || !mediaUrl) return res.status(400).json({ error: 'TITLE_AND_URL_REQUIRED' });
+    const type = sanitizeString(b.type, 20) || 'audio';
+    // For 'embed' type, skip extension whitelist; otherwise require allowed URL.
+    if (type !== 'embed' && !isAllowedUrl(mediaUrl)) return res.status(400).json({ error: 'BAD_MEDIA_URL' });
+    const cleanUrl = sanitizeUrl(mediaUrl, 900);
     const r = await fb.post('anasheed', {
       title:    sanitizeString(b.title, 120),
       artist:   sanitizeString(b.artist, 80),
-      audioUrl: sanitizeUrl(b.audioUrl, 800),
+      type,
+      url:      cleanUrl,
+      audioUrl: cleanUrl, // back-compat with old clients
+      mime:     sanitizeString(b.mime, 120),
       coverUrl: sanitizeUrl(b.coverUrl, 800),
       sectionId: b.sectionId ? sanitizeString(b.sectionId, 40) : null,
       tags:     sanitizeArrayOfStrings(b.tags, { max: 8, itemMax: 30 }),
@@ -274,7 +282,7 @@ router.post('/anasheed', auditAction('anasheed.create'), async (req, res) => {
       createdAt: Date.now(),
     });
     res.json({ id: r.name });
-  } catch { res.status(500).json({ error: 'INTERNAL' }); }
+  } catch (e) { console.error('[anasheed.create]', e.message); res.status(500).json({ error: 'INTERNAL' }); }
 });
 
 router.put('/anasheed/:id', auditAction('anasheed.update'), async (req, res) => {
@@ -282,7 +290,10 @@ router.put('/anasheed/:id', auditAction('anasheed.update'), async (req, res) => 
     const b = req.body || {}; const p = {};
     if (b.title     !== undefined) p.title    = sanitizeString(b.title, 120);
     if (b.artist    !== undefined) p.artist   = sanitizeString(b.artist, 80);
-    if (b.audioUrl  !== undefined) p.audioUrl = sanitizeUrl(b.audioUrl, 800);
+    if (b.audioUrl  !== undefined) { p.audioUrl = sanitizeUrl(b.audioUrl, 900); p.url = p.audioUrl; }
+    if (b.url       !== undefined) { p.url = sanitizeUrl(b.url, 900); p.audioUrl = p.url; }
+    if (b.type      !== undefined) p.type = sanitizeString(b.type, 20);
+    if (b.mime      !== undefined) p.mime = sanitizeString(b.mime, 120);
     if (b.coverUrl  !== undefined) p.coverUrl = sanitizeUrl(b.coverUrl, 800);
     if (b.sectionId !== undefined) p.sectionId = b.sectionId ? sanitizeString(b.sectionId, 40) : null;
     if (b.tags      !== undefined) p.tags     = sanitizeArrayOfStrings(b.tags, { max: 8, itemMax: 30 });
@@ -315,6 +326,8 @@ router.post('/side-menu', auditAction('menu.create'), async (req, res) => {
       order:  sanitizeInt(b.order, { def: Date.now() }),
       hidden: sanitizeBool(b.hidden),
       sectionIds: sanitizeArrayOfStrings(b.sectionIds, { max: 200, itemMax: 80 }),
+      media:  sanitizeMediaList(b.media),
+      description: sanitizeString(b.description, 500),
     });
     res.json({ id: r.name });
   } catch { res.status(500).json({ error: 'INTERNAL' }); }
@@ -329,6 +342,8 @@ router.put('/side-menu/:id', auditAction('menu.update'), async (req, res) => {
     if (b.order      !== undefined) p.order      = sanitizeInt(b.order);
     if (b.hidden     !== undefined) p.hidden     = sanitizeBool(b.hidden);
     if (b.sectionIds !== undefined) p.sectionIds = sanitizeArrayOfStrings(b.sectionIds, { max: 200, itemMax: 80 });
+    if (b.media       !== undefined) p.media       = sanitizeMediaList(b.media);
+    if (b.description !== undefined) p.description = sanitizeString(b.description, 500);
     await fb.patch(`sideMenu/${encodeURIComponent(req.params.id)}`, p);
     res.json({ ok: true });
   } catch { res.status(500).json({ error: 'INTERNAL' }); }
