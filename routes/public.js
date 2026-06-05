@@ -138,4 +138,35 @@ router.get('/detect-type', async (req, res) => {
   } catch { res.json({ type: 'text' }); }
 });
 
+// ----- Resolve embed URLs to direct media (best-effort) -----
+// Currently supports: archive.org details pages -> first mp4/m4v/webm/mp3 in the item.
+router.get('/resolve', async (req, res) => {
+  try {
+    const src = String(req.query.u || '').trim();
+    if (!/^https?:\/\//i.test(src)) return res.status(400).json({ error: 'BAD_URL' });
+    const u = new URL(src);
+    const host = u.hostname.toLowerCase();
+    // Archive.org
+    if (host === 'archive.org' || host.endsWith('.archive.org')){
+      const m = u.pathname.match(/^\/(details|embed)\/([^/?#]+)/);
+      if (m) {
+        const id = m[2];
+        const meta = await fetch(`https://archive.org/metadata/${encodeURIComponent(id)}`).then(r=>r.json()).catch(()=>null);
+        if (meta && Array.isArray(meta.files)) {
+          const pick = (exts) => meta.files.find(f => f && f.name && exts.some(e => f.name.toLowerCase().endsWith('.'+e)));
+          const v = pick(['mp4','m4v','webm','ogv']);
+          const a = pick(['mp3','m4a','ogg','wav','flac']);
+          const chosen = v || a;
+          if (chosen) {
+            const direct = `https://archive.org/download/${encodeURIComponent(id)}/${encodeURIComponent(chosen.name)}`;
+            return res.json({ ok:true, url: direct, type: v ? 'video' : 'audio', embed: `https://archive.org/embed/${encodeURIComponent(id)}` });
+          }
+        }
+        return res.json({ ok:true, url:'', type:'embed', embed:`https://archive.org/embed/${encodeURIComponent(id)}` });
+      }
+    }
+    return res.json({ ok:false });
+  } catch { res.json({ ok:false }); }
+});
+
 module.exports = router;
