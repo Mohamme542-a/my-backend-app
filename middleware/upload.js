@@ -55,7 +55,16 @@ function isAllowedUrl(url) {
   if (!clean) return false;
   const ext = extOf(clean);
   if (DANGEROUS_EXT.has(ext)) return false;
-  if (ext && !ALLOWED_EXT.has(ext)) return false;
+  // Allow unknown / no extension (e.g. archive.org/details/X, youtube watch URLs).
+  if (ext && !ALLOWED_EXT.has(ext)) {
+    // Still allow if hostname looks like a known embed/archive host.
+    try {
+      const host = new URL(clean).hostname.toLowerCase();
+      const ok = ['youtube.com','youtu.be','vimeo.com','archive.org','facebook.com','tiktok.com','soundcloud.com','dailymotion.com','twitch.tv','filelu.com']
+        .some(h => host === h || host.endsWith('.'+h));
+      if (!ok) return false;
+    } catch { return false; }
+  }
   return true;
 }
 
