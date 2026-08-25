@@ -13,10 +13,11 @@ const ADMIN_USERNAME      = String(process.env.ADMIN_USERNAME || '').trim();
 const ADMIN_PASSWORD_HASH = String(process.env.ADMIN_PASSWORD_HASH || '').trim();
 
 const REFRESH_COOKIE = 'rt';
-const cookieOpts = () => ({
+const isCapacitorRequest = req => /^(https|capacitor):\/\/localhost$/i.test(String(req.headers.origin || ''));
+const cookieOpts = req => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
+  secure: process.env.NODE_ENV === 'production' || isCapacitorRequest(req),
+  sameSite: isCapacitorRequest(req) ? 'none' : 'strict',
   signed: true,
   path: '/',
   maxAge: 30 * 24 * 3600 * 1000,
@@ -47,7 +48,7 @@ router.post('/login', authLimiter, verifyCsrf, auditAction('admin.login'), async
   const payload = { sub: ADMIN_USERNAME, role: 'admin' };
   const access = signAccess(payload);
   const { token: refresh } = signRefresh(payload);
-  res.cookie(REFRESH_COOKIE, refresh, cookieOpts());
+  res.cookie(REFRESH_COOKIE, refresh, cookieOpts(req));
   logEvent('admin.login.success', req, { status: 200 });
   res.json({
     accessToken: access,
@@ -65,7 +66,7 @@ router.post('/refresh', authLimiter, verifyCsrf, async (req, res) => {
     const p = verifyRefresh(token);
     const newRefresh = rotateRefresh(p.jti, { sub: p.sub, role: p.role });
     const access = signAccess({ sub: p.sub, role: p.role });
-    res.cookie(REFRESH_COOKIE, newRefresh.token, cookieOpts());
+    res.cookie(REFRESH_COOKIE, newRefresh.token, cookieOpts(req));
     res.json({ accessToken: access, csrfToken: res.locals.csrfToken, expiresIn: 900 });
   } catch {
     res.clearCookie(REFRESH_COOKIE, { path: '/' });

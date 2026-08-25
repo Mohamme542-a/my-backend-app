@@ -11,12 +11,15 @@ const ALLOWED = (process.env.ALLOWED_ORIGINS || '')
   .split(',').map(s => s.trim()).filter(Boolean);
 
 const LOCALHOST_RE = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i;
+const CAPACITOR_ORIGIN_RE = /^(https|capacitor):\/\/localhost$/i;
 
 // ---- CORS (restricted with dev-friendly localhost passthrough) ----
 const corsOptions = {
   origin(origin, cb) {
     // Same-origin / curl / mobile webview (no Origin header) → allowed.
     if (!origin) return cb(null, true);
+    // Capacitor's fixed local WebView origin is allowed for authenticated API calls.
+    if (CAPACITOR_ORIGIN_RE.test(origin)) return cb(null, true);
     // Always allow localhost during development.
     if (process.env.NODE_ENV !== 'production' && LOCALHOST_RE.test(origin)) return cb(null, true);
     // Explicit allow-list match.
@@ -100,12 +103,17 @@ function sanitizeBody(req, _res, next) {
 // ---- CSRF (double-submit cookie + same-site lax) ----
 const CSRF_COOKIE = 'csrf_token';
 
+function isCapacitorRequest(req) {
+  return CAPACITOR_ORIGIN_RE.test(String(req.headers.origin || ''));
+}
+
 function issueCsrfToken(req, res, next) {
   if (!req.signedCookies?.[CSRF_COOKIE]) {
     const tok = crypto.randomBytes(32).toString('hex');
     res.cookie(CSRF_COOKIE, tok, {
-      signed: true, httpOnly: false, sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      signed: true, httpOnly: false,
+      sameSite: isCapacitorRequest(req) ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === 'production' || isCapacitorRequest(req),
       path: '/', maxAge: 24 * 3600 * 1000,
     });
     res.locals.csrfToken = tok;
