@@ -1,9 +1,9 @@
-# تقرير إصلاح v4.1 — إصلاحات أمنية وهيكلية
+# تقرير ترحيل Archive v5.0 — إصلاحات أمنية وهيكلية
 
 ## ✅ ما تم إصلاحه
 
 ### 1. حماية admin.html على مستوى الخادم
-- أُضيف middleware `protectAdminPages` في `server-secure.js` قبل خدمة الملفات الثابتة.
+- تم تفعيل middleware `protectAdminPages` في `server-secure.js` قبل خدمة الملفات الثابتة.
 - يتم التحقق من JWT (`Authorization: Bearer`) أو من `refresh token` المُوقَّع في الكوكي.
 - في حال عدم وجود توكن صالح → إعادة توجيه 302 إلى `/admin-login.html`.
 - لا يمكن الوصول لـ `admin.html` بمجرد معرفة الرابط.
@@ -25,10 +25,10 @@
 ### 5. Service Worker + js/api.js
 - `/sw.js` يقوم بـ network-first لـ `/api/*` و stale-while-revalidate للأصول.
 - يتجاهل تمامًا `/admin*` و `/api/admin*` و `/api/stream` لتفادي مخاطر التخزين المؤقت للوسائط الحساسة.
-- `/js/api.js` يحتوي مساعد `AtheerAPI` بسيط + `normalizeMediaUrl` التي تمرّر كل وسائط HTTP عبر `/api/stream`.
+- تم توحيد `normalizeMediaUrl` داخل واجهة Archive لتمرير وسائط HTTP عبر `/api/stream`، وأزيلت إحالة `/js/api.js` غير الموجودة.
 
 ### 6. ملاحظات لم تُنفَّذ (مقصودة)
-- لم يتم تجزئة `index.html` إلى عدة وحدات (`video-player.js`, `audio-player.js`, ...) لأن ذلك يتطلّب إعادة كتابة كاملة للواجهة الحالية. تم توفير الأساس (`js/api.js` + `sw.js`) ليُبنى عليه لاحقًا.
+- ما زالت الواجهة في ملفات HTML كبيرة لتقليل مخاطر تغيير نموذج البيانات القديم، مع إضافة اختبار دخان قابل للتشغيل عبر `npm test`.
 - لم يُضَف SRI لـ `hls.js` — يُستحسن استضافته محليًا في `public/vendor/hls.min.js` لاحقًا.
 
 ## كيفية النشر

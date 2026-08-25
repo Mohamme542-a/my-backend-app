@@ -40,6 +40,7 @@ const helmetMw = helmet({
       'default-src': ["'self'"],
       'base-uri': ["'self'"],
       'frame-ancestors': ["'none'"],
+      'frame-src': ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com', 'https://player.vimeo.com', 'https://www.facebook.com', 'https://www.tiktok.com', 'https://www.dailymotion.com', 'https://w.soundcloud.com', 'https://archive.org', 'https://player.twitch.tv'],
       'object-src': ["'none'"],
       'img-src': ["'self'", 'data:', 'blob:', 'https:'],
       'media-src': ["'self'", 'blob:', 'https:'],

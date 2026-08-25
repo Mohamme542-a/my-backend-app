@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>أثير — لوحة الأدمن</title>
+<title>Archive — لوحة الإدارة</title>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -11,9 +11,9 @@
   --bg:#07070a;--surface:#15151c;--surface-2:#1d1d27;--surface-3:#262633;
   --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.14);
   --text:#f5f5f7;--muted:#9a9aa6;--dim:#6b6b78;
-  --red:#ef2b3d;--red-2:#ff4757;--green:#22c55e;--amber:#f59e0b;
-  --grad:linear-gradient(135deg,#ef2b3d,#ff4757,#7a0610);
-  --shadow:0 20px 60px -20px rgba(239,43,61,.4);
+  --red:#7c3aed;--red-2:#06b6d4;--green:#22c55e;--amber:#f59e0b;
+  --grad:linear-gradient(135deg,#7c3aed,#06b6d4,#f97316);
+  --shadow:0 20px 60px -20px rgba(124,58,237,.4);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bot:env(safe-area-inset-bottom,0px);
 }
@@ -164,7 +164,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 <div id="admin">
 
   <div class="topbar">
-    <div class="h-brand">أثير · الأدمن</div>
+    <div class="h-brand">Archive · الإدارة</div>
     <div class="api-pill">API: <span id="api-status" class="bad">●</span> <span id="api-url" style="direction:ltr"></span></div>
   </div>
 
@@ -213,7 +213,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
       <div class="drop" id="drop">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
         <p><strong>اسحب وأفلت</strong> الملفات هنا، أو <strong>اضغط لاختيارها</strong></p>
-        <p class="muted">فيديو · صور · PDF · صوت — بدون حد للحجم</p>
+        <p class="muted">فيديو · صور · PDF · صوت — حتى 200MB للملف الواحد</p>
         <input type="file" id="file-input" multiple accept="video/*,image/*,audio/*,.pdf" style="display:none"/>
       </div>
       <div class="upload-list" id="up-list"></div>
@@ -468,7 +468,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 
 <script>
 /* ============================================================
-   أثير — Admin v4.1 (Fixed Authentication)
+   Archive — Admin Console
    ============================================================ */
  const API = (window.__API__ || location.origin).replace(/\/+$/,'');
 
@@ -676,6 +676,10 @@ function detectKind(file){
   if (m === 'application/pdf' || /\.pdf$/i.test(file.name)) return 'pdf';
   return 'text';
 }
+function mimeForKind(kind, file){
+  if (file && file.type) return file.type;
+  return ({ video:'video/mp4', image:'image/jpeg', audio:'audio/mpeg', pdf:'application/pdf' })[kind] || '';
+}
 
 async function uploadFile(file, onProgress){
   const kind = detectKind(file);
@@ -702,10 +706,13 @@ async function uploadFile(file, onProgress){
     xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100)); };
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        const j = JSON.parse(xhr.responseText);
-        resolve({ url:j.secure_url, kind, width:j.width||0, height:j.height||0,
-                  duration:j.duration||0, size:j.bytes||file.size,
-                  mime:file.type, name:file.name });
+        try {
+          const j = JSON.parse(xhr.responseText);
+          if (!j.secure_url) throw new Error('INVALID_UPLOAD_RESPONSE');
+          resolve({ url:j.secure_url, kind, width:j.width||0, height:j.height||0,
+                    duration:j.duration||0, size:j.bytes||file.size,
+                    mime:mimeForKind(kind, file), name:file.name });
+        } catch { reject(new Error('invalid upload response')); }
       } else reject(new Error('upload failed '+xhr.status));
     };
     xhr.onerror = () => reject(new Error('network'));
@@ -777,6 +784,7 @@ drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('
 async function handleFiles(files){
   const upList = $('#up-list');
   for (const file of Array.from(files)) {
+    try { validateUploadFile(file); } catch (e) { toast(e.message === 'FILE_TOO_LARGE' ? 'الملف أكبر من 200MB' : 'نوع الملف غير مدعوم', 'err'); continue; }
     const row = document.createElement('div'); row.className = 'up-item';
     row.innerHTML = `<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
     upList.appendChild(row);
@@ -1002,6 +1010,7 @@ document.addEventListener('input', e=>{ const c=e.target.closest('[data-scap]');
 async function sHandleFiles(files){
   const list=$('#s-up-list');
   for(const file of Array.from(files)){
+    try { validateUploadFile(file); } catch (e) { toast(e.message === 'FILE_TOO_LARGE' ? 'الملف أكبر من 200MB' : 'نوع الملف غير مدعوم', 'err'); continue; }
     const row=document.createElement('div');row.className='up-item';
     row.innerHTML=`<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
     list.appendChild(row);const bar=row.querySelector('.up-bar > div');
@@ -1032,6 +1041,7 @@ $('#s-url-add')?.addEventListener('click',()=>{
 async function aHandleFiles(files){
   if (!files || !files.length) return;
   const file = files[0]; // single for simplicity
+  try { validateUploadFile(file); } catch (e) { toast(e.message === 'FILE_TOO_LARGE' ? 'الملف أكبر من 200MB' : 'نوع الملف غير مدعوم', 'err'); return; }
   const row = document.createElement('div');
   row.className = 'up-item';
   row.style.margin = '8px 0';
@@ -1042,6 +1052,7 @@ async function aHandleFiles(files){
   try {
     const res = await uploadFile(file, p => bar.style.width = p + '%');
     $('#a-url').value = res.url || '';
+    window.__lastUploadedMime = res.mime || mimeForKind(res.kind, file);
     if ($('#a-type')) {
       // Auto set type based on upload kind
       const kind = res.kind || detectKind(file);
@@ -1279,61 +1290,16 @@ $('#st-clear-url')?.addEventListener('click', () => {
 
 
 /* ============================================================
-   FileLu hybrid upload (videos > 100MB)
+   Upload guardrails
    ============================================================ */
-const FILELU_API_KEY = '1472333q9e036on4kne4kh';
-const FILELU_THRESHOLD = 100 * 1024 * 1024; // 100 MB
-
-async function uploadToFileLu(file, onProgress){
-  // 1) Ask FileLu for an upload server.
-  let server;
-  try {
-    const r = await fetch(`https://filelu.com/api/upload/server?key=${encodeURIComponent(FILELU_API_KEY)}`);
-    const j = await r.json();
-    server = (j && j.result) || (j && j.server_url) || (j && j.data && j.data.server_url);
-    if (!server) throw new Error('NO_SERVER');
-  } catch (e) {
-    throw new Error('FileLu: تعذر الاتصال (قد يكون CORS محظوراً، استخدم Cloudinary)');
-  }
-  // 2) Upload file directly.
-  return new Promise((resolve, reject) => {
-    const fd = new FormData();
-    fd.append('key', FILELU_API_KEY);
-    fd.append('file', file);
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', server);
-    xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(Math.round(e.loaded/e.total*100)); };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const j = JSON.parse(xhr.responseText);
-          // FileLu typically returns [{ file_code, file_status, ... }]
-          const item = Array.isArray(j) ? j[0] : (j.files ? j.files[0] : j);
-          const code = item && (item.file_code || item.code);
-          if (!code) return reject(new Error('FileLu: استجابة غير متوقعة'));
-          const url = `https://filelu.com/${code}`;
-          resolve({ url, kind: detectKind(file), size: file.size, mime: file.type, name: file.name, fromFilelu: true });
-        } catch (e) { reject(new Error('FileLu: استجابة غير صالحة')); }
-      } else reject(new Error('FileLu: فشل الرفع ' + xhr.status));
-    };
-    xhr.onerror = () => reject(new Error('FileLu: خطأ شبكة (CORS؟)'));
-    xhr.send(fd);
-  });
+const MAX_UPLOAD_BYTES = 200 * 1024 * 1024;
+function validateUploadFile(file){
+  if (!file) throw new Error('INVALID_FILE');
+  if (file.size > MAX_UPLOAD_BYTES) throw new Error('FILE_TOO_LARGE');
+  const kind = detectKind(file);
+  if (!['video','image','audio','pdf'].includes(kind)) throw new Error('UNSUPPORTED_FILE');
+  return kind;
 }
-
-// Wrap original uploadFile so >100MB videos go through FileLu transparently.
-const __origUploadFile = uploadFile;
-window.uploadFile = async function smartUpload(file, onProgress){
-  const isBigVideo = (file.type||'').startsWith('video/') && file.size > FILELU_THRESHOLD;
-  if (isBigVideo) {
-    try { const r = await uploadToFileLu(file, onProgress); toast('تم الرفع إلى FileLu','ok'); return r; }
-    catch (e) { toast(e.message + ' — سيتم استخدام Cloudinary','err'); }
-  }
-  const r = await __origUploadFile(file, onProgress);
-  window.__lastUploadedMime = r.mime || '';
-  return r;
-};
-
 /* ============================================================
    Font selector
    ============================================================ */
@@ -1391,6 +1357,7 @@ document.addEventListener('input', e=>{ const c=e.target.closest('[data-mncap]')
 async function mnHandleFiles(files){
   const list=$('#mn-up-list');
   for(const file of Array.from(files)){
+    try { validateUploadFile(file); } catch (e) { toast(e.message === 'FILE_TOO_LARGE' ? 'الملف أكبر من 200MB' : 'نوع الملف غير مدعوم', 'err'); continue; }
     const row=document.createElement('div');row.className='up-item';
     row.innerHTML=`<div class="nm"><span>${esc(file.name)}</span><span>${fmtBytes(file.size)}</span></div><div class="up-bar"><div style="width:0%"></div></div>`;
     list.appendChild(row);const bar=row.querySelector('.up-bar > div');

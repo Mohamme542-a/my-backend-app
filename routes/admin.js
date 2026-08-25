@@ -10,13 +10,14 @@ const { uploadLimiter, verifyCsrf } = require('../middleware/security');
 const { auditAction } = require('../middleware/audit');
 const { signCloudinaryUpload, isAllowedUrl, isAllowedMime } = require('../middleware/upload');
 const { sanitizeMediaList } = require('../lib/media');
+const MEDIA_TYPES = new Set(['audio','video','image','pdf','embed']);
 const {
   clamp, sanitizeString, sanitizeRichText, sanitizeUrl,
   sanitizeHexColor, sanitizeBool, sanitizeInt, sanitizeArrayOfStrings,
 } = require('../utils/validators');
 
 // GLOBAL admin guard — applies to every route below.
-// router.use(verifyAccess, requireAdmin, verifyCsrf);  // معطل مؤقتاً
+router.use(verifyAccess, requireAdmin, verifyCsrf);
 
 const toArr = obj => Object.entries(obj || {}).map(([id, v]) => ({ id, ...v }));
 
@@ -263,17 +264,20 @@ router.post('/anasheed', auditAction('anasheed.create'), async (req, res) => {
     const b = req.body || {};
     const mediaUrl = b.url || b.audioUrl;
     if (!b.title || !mediaUrl) return res.status(400).json({ error: 'TITLE_AND_URL_REQUIRED' });
-    const type = sanitizeString(b.type, 20) || 'audio';
+    const type = sanitizeString(b.type, 20).toLowerCase() || 'audio';
+    if (!MEDIA_TYPES.has(type)) return res.status(400).json({ error: 'BAD_MEDIA_TYPE' });
     // For 'embed' type, skip extension whitelist; otherwise require allowed URL.
     if (type !== 'embed' && !isAllowedUrl(mediaUrl)) return res.status(400).json({ error: 'BAD_MEDIA_URL' });
     const cleanUrl = sanitizeUrl(mediaUrl, 900);
+    const mime = sanitizeString(b.mime, 120).toLowerCase();
+    if (mime && !isAllowedMime(mime)) return res.status(400).json({ error: 'BAD_MEDIA_MIME' });
     const r = await fb.post('anasheed', {
       title:    sanitizeString(b.title, 120),
       artist:   sanitizeString(b.artist, 80),
       type,
       url:      cleanUrl,
       audioUrl: cleanUrl, // back-compat with old clients
-      mime:     sanitizeString(b.mime, 120),
+      mime,
       coverUrl: sanitizeUrl(b.coverUrl, 800),
       sectionId: b.sectionId ? sanitizeString(b.sectionId, 40) : null,
       tags:     sanitizeArrayOfStrings(b.tags, { max: 8, itemMax: 30 }),
@@ -292,8 +296,16 @@ router.put('/anasheed/:id', auditAction('anasheed.update'), async (req, res) => 
     if (b.artist    !== undefined) p.artist   = sanitizeString(b.artist, 80);
     if (b.audioUrl  !== undefined) { p.audioUrl = sanitizeUrl(b.audioUrl, 900); p.url = p.audioUrl; }
     if (b.url       !== undefined) { p.url = sanitizeUrl(b.url, 900); p.audioUrl = p.url; }
-    if (b.type      !== undefined) p.type = sanitizeString(b.type, 20);
-    if (b.mime      !== undefined) p.mime = sanitizeString(b.mime, 120);
+    if (b.type !== undefined) {
+      const type = sanitizeString(b.type, 20).toLowerCase();
+      if (!MEDIA_TYPES.has(type)) return res.status(400).json({ error: 'BAD_MEDIA_TYPE' });
+      p.type = type;
+    }
+    if (b.mime !== undefined) {
+      const mime = sanitizeString(b.mime, 120).toLowerCase();
+      if (mime && !isAllowedMime(mime)) return res.status(400).json({ error: 'BAD_MEDIA_MIME' });
+      p.mime = mime;
+    }
     if (b.coverUrl  !== undefined) p.coverUrl = sanitizeUrl(b.coverUrl, 800);
     if (b.sectionId !== undefined) p.sectionId = b.sectionId ? sanitizeString(b.sectionId, 40) : null;
     if (b.tags      !== undefined) p.tags     = sanitizeArrayOfStrings(b.tags, { max: 8, itemMax: 30 });
@@ -421,16 +433,28 @@ router.post('/anasheed/broadcast-cover', auditAction('anasheed.broadcast-cover')
     const coverUrl = sanitizeUrl(req.body?.coverUrl, 800);
     if (!coverUrl) return res.status(400).json({ error: 'COVER_URL_REQUIRED' });
     const onlyMissing = sanitizeBool(req.body?.onlyMissing);
+    const sectionId = req.body?.sectionId ? sanitizeString(req.body.sectionId, 40) : '';
     const all = (await fb.get('anasheed')) || {};
-    const ids = Object.keys(all);
+    const candidates = Object.entries(all).filter(([, item]) => !sectionId || String(item?.sectionId || '') === sectionId);
     let updated = 0;
-    await Promise.all(ids.map(id => {
-      const cur = all[id] || {};
-      if (onlyMissing && cur.coverUrl) return null;
+    await Promise.all(candidates.map(([id, cur]) => {
+      if (onlyMissing && cur?.coverUrl) return null;
       updated++;
       return fb.patch(`anasheed/${encodeURIComponent(id)}`, { coverUrl, updatedAt: Date.now() });
     }));
-    res.json({ ok: true, updated, total: ids.length });
+
+    let mediaUpdated = 0;
+    if (sectionId) {
+      const section = await fb.get(`sections/${encodeURIComponent(sectionId)}`);
+      if (!section) return res.status(404).json({ error: 'SECTION_NOT_FOUND' });
+      const media = Array.isArray(section.media) ? section.media.map(item => {
+        if (onlyMissing && item?.cover) return item;
+        mediaUpdated++;
+        return { ...item, cover: coverUrl, poster: item?.poster || coverUrl, thumb: item?.thumb || coverUrl, updatedAt: Date.now() };
+      }) : [];
+      await fb.patch(`sections/${encodeURIComponent(sectionId)}`, { media, updatedAt: Date.now() });
+    }
+    res.json({ ok: true, updated, mediaUpdated, total: candidates.length });
   } catch { res.status(500).json({ error: 'INTERNAL' }); }
 });
 

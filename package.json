@@ -1,13 +1,14 @@
 {
-  "name": "qarfash-atheer-secure",
+  "name": "archive-media-platform",
   "version": "4.0.0",
-  "description": "Production-ready, modular, hardened backend for the Qarfash/Atheer media platform.",
+  "description": "Production-ready media archive platform with secure admin tools and resilient PDF/video handling.",
   "main": "server-secure.js",
   "scripts": {
     "start": "node server-secure.js",
     "dev": "NODE_ENV=development node server-secure.js",
     "hash": "node scripts/hash.js",
-    "genkeys": "node scripts/genkeys.js"
+    "genkeys": "node scripts/genkeys.js",
+    "test": "node scripts/smoke-test.js"
   },
   "engines": { "node": ">=18.0.0" },
   "dependencies": {
@@ -21,6 +22,7 @@
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.7.0",
+    "dotenv": "^16.4.5",
     "validator": "^13.12.0",
     "xss": "^1.0.15"
   }

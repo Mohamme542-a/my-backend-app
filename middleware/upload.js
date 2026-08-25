@@ -46,7 +46,11 @@ const ALLOWED_MIME = new Set([
 function extOf(url) {
   try {
     const u = new URL(url);
-    return u.pathname.toLowerCase().split('.').pop() || '';
+    const segment = u.pathname.toLowerCase().split('/').filter(Boolean).pop() || '';
+    const dot = segment.lastIndexOf('.');
+    if (dot <= 0 || dot === segment.length - 1) return '';
+    const ext = segment.slice(dot + 1);
+    return /^[a-z0-9]{1,10}$/.test(ext) ? ext : '';
   } catch { return ''; }
 }
 

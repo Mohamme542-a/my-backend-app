@@ -4,14 +4,13 @@ const express = require('express');
 const router  = express.Router();
 const crypto  = require('crypto');
 
-const { authLimiter } = require('../middleware/security');
+const { authLimiter, verifyCsrf } = require('../middleware/security');
 const { signAccess, signRefresh, verifyRefresh, rotateRefresh, revokeRefresh, bcryptCompare, verifyAccess, requireAdmin } = require('../middleware/auth');
 const { auditAction, logEvent } = require('../middleware/audit');
 const { validateUsername, validatePassword } = require('../utils/validators');
 
-// ✅ بيانات تسجيل الدخول - اسم مستخدم طويل + هاش صحيح
-const ADMIN_USERNAME      = 'Djdndndhdjdndbdb';
-const ADMIN_PASSWORD_HASH = '$2a$12$Rpsh69daceKkSQWJ66dX9O3RfcXxRIG6DAlT4jXYEz2nFd43a1zbe';
+const ADMIN_USERNAME      = String(process.env.ADMIN_USERNAME || '').trim();
+const ADMIN_PASSWORD_HASH = String(process.env.ADMIN_PASSWORD_HASH || '').trim();
 
 const REFRESH_COOKIE = 'rt';
 const cookieOpts = () => ({
@@ -19,7 +18,7 @@ const cookieOpts = () => ({
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'strict',
   signed: true,
-  path: '/api/admin/auth',
+  path: '/',
   maxAge: 30 * 24 * 3600 * 1000,
 });
 
@@ -29,38 +28,22 @@ function timingEq(a, b) {
 }
 
 // ----- POST /api/admin/auth/login -----
-router.post('/login', authLimiter, auditAction('admin.login'), async (req, res) => {
+router.post('/login', authLimiter, verifyCsrf, auditAction('admin.login'), async (req, res) => {
   const { username, password } = req.body || {};
-  
-  console.log('========================================');
-  console.log('[LOGIN] Username:', username);
-  console.log('[LOGIN] Password length:', password?.length);
-  console.log('[LOGIN] Expected username:', ADMIN_USERNAME);
-  console.log('========================================');
   
   if (!validateUsername(username) || !validatePassword(password)) {
     logEvent('admin.login.invalid_input', req, { status: 400 });
     return res.status(400).json({ error: 'BAD_CREDENTIALS' });
   }
   
-  const userOk = ADMIN_USERNAME && timingEq(username, ADMIN_USERNAME);
-  console.log('[CHECK] userOk:', userOk);
-  
-  let passOk = false;
-  try {
-    passOk = await bcryptCompare(password, ADMIN_PASSWORD_HASH);
-    console.log('[CHECK] passOk:', passOk);
-  } catch (err) {
-    console.log('[ERROR] bcryptCompare:', err.message);
-  }
+  const userOk = !!ADMIN_USERNAME && timingEq(username, ADMIN_USERNAME);
+  const passOk = await bcryptCompare(password, ADMIN_PASSWORD_HASH);
   
   if (!userOk || !passOk) {
-    console.log('[FAILED] Invalid credentials ❌');
     logEvent('admin.login.failed', req, { status: 401, extra: { username } });
     return res.status(401).json({ error: 'BAD_CREDENTIALS' });
   }
   
-  console.log('[SUCCESS] Login successful ✅');
   const payload = { sub: ADMIN_USERNAME, role: 'admin' };
   const access = signAccess(payload);
   const { token: refresh } = signRefresh(payload);
@@ -75,7 +58,7 @@ router.post('/login', authLimiter, auditAction('admin.login'), async (req, res) 
 });
 
 // ----- POST /api/admin/auth/refresh -----
-router.post('/refresh', authLimiter, async (req, res) => {
+router.post('/refresh', authLimiter, verifyCsrf, async (req, res) => {
   const token = req.signedCookies?.[REFRESH_COOKIE];
   if (!token) return res.status(401).json({ error: 'NO_REFRESH' });
   try {
@@ -85,18 +68,18 @@ router.post('/refresh', authLimiter, async (req, res) => {
     res.cookie(REFRESH_COOKIE, newRefresh.token, cookieOpts());
     res.json({ accessToken: access, csrfToken: res.locals.csrfToken, expiresIn: 900 });
   } catch {
-    res.clearCookie(REFRESH_COOKIE, { path: '/api/admin/auth' });
+    res.clearCookie(REFRESH_COOKIE, { path: '/' });
     res.status(401).json({ error: 'INVALID_REFRESH' });
   }
 });
 
 // ----- POST /api/admin/auth/logout -----
-router.post('/logout', verifyAccess, requireAdmin, auditAction('admin.logout'), (req, res) => {
+router.post('/logout', verifyAccess, requireAdmin, verifyCsrf, auditAction('admin.logout'), (req, res) => {
   const token = req.signedCookies?.[REFRESH_COOKIE];
   if (token) {
     try { const p = verifyRefresh(token); revokeRefresh(p.jti); } catch {}
   }
-  res.clearCookie(REFRESH_COOKIE, { path: '/api/admin/auth' });
+  res.clearCookie(REFRESH_COOKIE, { path: '/' });
   res.json({ ok: true });
 });
 

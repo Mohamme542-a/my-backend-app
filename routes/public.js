@@ -5,10 +5,56 @@
 const express = require('express');
 const router  = express.Router();
 const fetch   = require('node-fetch');
+const dns     = require('dns').promises;
+const net     = require('net');
 
 const fb = require('../lib/firebase');
 const { guessMime, detectType } = require('../lib/media');
-const { globalLimiter } = require('../middleware/security');
+const REMOTE_TIMEOUT_MS = 25_000;
+const MAX_REDIRECTS = 4;
+
+function isPrivateAddress(address) {
+  const normalized = String(address || '').toLowerCase();
+  if (normalized === '::1' || normalized.startsWith('fc') || normalized.startsWith('fd') || normalized.startsWith('fe80:')) return true;
+  if (net.isIP(normalized) === 4) {
+    const parts = normalized.split('.').map(Number);
+    return parts[0] === 10 || parts[0] === 127 || (parts[0] === 169 && parts[1] === 254) ||
+      (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+      (parts[0] === 192 && parts[1] === 168) || parts[0] === 0;
+  }
+  return false;
+}
+
+async function assertSafeRemoteUrl(raw) {
+  const url = new URL(String(raw));
+  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('BAD_PROTOCOL');
+  const host = url.hostname.toLowerCase();
+  if (!host || host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal')) throw new Error('PRIVATE_HOST');
+  if (isPrivateAddress(host)) throw new Error('PRIVATE_HOST');
+  if (!net.isIP(host)) {
+    const records = await dns.lookup(host, { all: true, verbatim: true });
+    if (!records.length || records.some(record => isPrivateAddress(record.address))) throw new Error('PRIVATE_HOST');
+  }
+  return url;
+}
+
+async function fetchRemote(rawUrl, options = {}, redirects = 0) {
+  const url = await assertSafeRemoteUrl(rawUrl);
+  if (redirects > MAX_REDIRECTS) throw new Error('TOO_MANY_REDIRECTS');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REMOTE_TIMEOUT_MS);
+  try {
+    const response = await fetch(url.toString(), { ...options, redirect: 'manual', signal: controller.signal });
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      if (!location) throw new Error('REDIRECT_WITHOUT_LOCATION');
+      return fetchRemote(new URL(location, url).toString(), options, redirects + 1);
+    }
+    return response;
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 const sortFeed = (a, b) =>
   Number(!!b.pinned) - Number(!!a.pinned) ||
@@ -17,11 +63,9 @@ const sortFeed = (a, b) =>
 
 const toArr = obj => Object.entries(obj || {}).map(([id, v]) => ({ id, ...v }));
 
-router.use(globalLimiter);
-
 // ----- Health -----
 router.get('/health', (_q, r) => r.json({
-  ok: true, t: Date.now(), v: '4.0',
+  ok: true, t: Date.now(), v: '5.0',
   fb: !!process.env.FIREBASE_DB_URL,
   cloud: !!process.env.CLOUDINARY_CLOUD_NAME,
   signed: !!(process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET),
@@ -90,11 +134,13 @@ async function pipeStream(req, res, sendBody) {
     if (!/^https?:\/\//i.test(src)) return res.status(400).end();
     const headers = {};
     if (req.headers.range) headers.range = req.headers.range;
-    const upstream = await fetch(src, { headers, redirect: 'follow' });
+    const upstream = await fetchRemote(src, { headers });
     const upstreamType = String(upstream.headers.get('content-type') || '').toLowerCase();
-    const mimeHint = String(req.query.mime || req.query.ct || '').trim();
+    const disposition = String(upstream.headers.get('content-disposition') || '');
+    const filename = (disposition.match(/filename\*?=(?:UTF-8''|\"?)([^;\"]+)/i) || [])[1] || '';
+    const mimeHint = String(req.query.mime || req.query.ct || req.query.type || '').trim();
     const contentType = (!upstreamType || /octet-stream/.test(upstreamType))
-      ? guessMime(src, mimeHint)
+      ? guessMime(filename || src, mimeHint)
       : upstreamType;
 
     res.status(upstream.status);
@@ -125,15 +171,16 @@ router.get('/detect-type', async (req, res) => {
   try {
     const src = String(req.query.u || '');
     if (!/^https?:\/\//i.test(src)) return res.json({ type: 'text' });
-    let r = await fetch(src, { method: 'HEAD', redirect: 'follow' }).catch(() => null);
-    if (!r || !r.ok) r = await fetch(src, { method: 'GET', headers: { range: 'bytes=0-0' } }).catch(() => null);
+    let r = await fetchRemote(src, { method:'HEAD' }).catch(() => null);
+    if (!r || !r.ok) r = await fetchRemote(src, { method:'GET', headers: { range: 'bytes=0-0' } }).catch(() => null);
     const ct = (r && r.headers.get('content-type') || '').toLowerCase();
+    const cd = (r && r.headers.get('content-disposition') || '').toLowerCase();
     let type = 'text';
     if (ct.startsWith('video/') || ct.includes('mpegurl') || ct.includes('matroska')) type = 'video';
     else if (ct.startsWith('audio/')) type = 'audio';
     else if (ct.startsWith('image/')) type = 'image';
-    else if (ct.includes('pdf'))      type = 'pdf';
-    else type = detectType(src);
+    else if (ct.includes('pdf') || cd.includes('.pdf')) type = 'pdf';
+    else type = detectType(src, ct);
     res.json({ type, contentType: ct });
   } catch { res.json({ type: 'text' }); }
 });
@@ -151,7 +198,7 @@ router.get('/resolve', async (req, res) => {
       const m = u.pathname.match(/^\/(details|embed)\/([^/?#]+)/);
       if (m) {
         const id = m[2];
-        const meta = await fetch(`https://archive.org/metadata/${encodeURIComponent(id)}`).then(r=>r.json()).catch(()=>null);
+        const meta = await fetchRemote(`https://archive.org/metadata/${encodeURIComponent(id)}`).then(r=>r.json()).catch(()=>null);
         if (meta && Array.isArray(meta.files)) {
           const pick = (exts) => meta.files.find(f => f && f.name && exts.some(e => f.name.toLowerCase().endsWith('.'+e)));
           const v = pick(['mp4','m4v','webm','ogv']);

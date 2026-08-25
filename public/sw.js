@@ -1,8 +1,8 @@
 /* Service Worker — cache static shell, network-first for API, bypass admin pages. */
-const VERSION   = 'atheer-v4.2';
+const VERSION   = 'archive-v5.0';
 const STATIC    = `${VERSION}-static`;
 const RUNTIME   = `${VERSION}-runtime`;
-const PRECACHE  = ['/', '/index.html', '/js/api.js'];
+const PRECACHE  = ['/', '/index.html', '/admin-login.html'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(STATIC).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
@@ -24,7 +24,8 @@ self.addEventListener('fetch', (e) => {
   // Never cache or intercept admin pages / auth / streaming.
   if (url.pathname.startsWith('/admin') ||
       url.pathname.startsWith('/api/admin') ||
-      url.pathname.startsWith('/api/stream')) return;
+      url.pathname.startsWith('/api/stream') ||
+      url.pathname.startsWith('/api/csrf')) return;
 
   // Network-first for public API.
   if (url.pathname.startsWith('/api/')) {

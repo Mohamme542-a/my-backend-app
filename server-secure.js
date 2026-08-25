@@ -1,4 +1,4 @@
-// server-secure.js — Qarfash / Atheer secure backend v4.0
+// server-secure.js — Archive secure backend v5.0
 //
 // Modular hardened server. Every concern is isolated:
 //   - middleware/security.js   Helmet, CORS, rate limit, CSRF, sanitization
@@ -38,25 +38,20 @@ function protectAdminPages(req, res, next) {
     const m = (req.headers.authorization || '').match(/^Bearer\s+(.+)$/i);
     if (m) token = m[1];
     
-    // 2. التحقق من Query String (access_token)
-    if (!token && req.query.access_token) {
-      token = req.query.access_token;
-    }
-    
-    // 3. التحقق من الـ token
+    // 2. التحقق من الـ token
     if (token) {
       try {
         const p = jwt.verify(token, process.env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] });
-        if (p.role === 'admin') return next();
+        if (p.role === 'admin' && p.typ === 'access') return next();
       } catch {}
     }
     
-    // 4. التحقق من Refresh Cookie
+    // 3. التحقق من Refresh Cookie
     const refresh = req.signedCookies?.rt;
     if (refresh) {
       try {
         const p = jwt.verify(refresh, process.env.JWT_REFRESH_SECRET, { algorithms: ['HS256'] });
-        if (p.role === 'admin') return next();
+        if (p.role === 'admin' && p.typ === 'refresh') return next();
       } catch {}
     }
     return res.redirect(302, '/admin-login.html');
@@ -99,7 +94,7 @@ app.use(sec.globalLimiter);                               // 10. Global rate lim
 app.use(sec.issueCsrfToken);                              // 11. CSRF cookie (double-submit)
 
 // ----- Routes -----
-app.get('/healthz', (_q, r) => r.json({ ok: true, t: Date.now(), v: '4.0' }));
+app.get('/healthz', (_q, r) => r.json({ ok: true, t: Date.now(), v: '5.0' }));
 
 // CSRF token endpoint for SPA bootstrap.
 app.get('/api/csrf', (_req, res) => res.json({ csrfToken: res.locals.csrfToken }));
@@ -115,7 +110,7 @@ app.use('/api/admin', adminApi);
 app.use('/api', publicApi);
 
 // Server-side admin page protection (MUST be before static)
-// app.use(protectAdminPages);  // معطل مؤقتاً للاختبار
+app.use(protectAdminPages);
 
 // Static frontend (admin-login.html, index.html, etc.)
 app.use(express.static(path.join(__dirname, 'public'), {
@@ -139,5 +134,5 @@ app.use((err, _q, res, _next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`[secure-api v4.0] listening on :${PORT} (env=${process.env.NODE_ENV || 'development'})`);
+  console.log(`[archive-api v5.0] listening on :${PORT} (env=${process.env.NODE_ENV || 'development'})`);
 });
