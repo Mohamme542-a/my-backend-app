@@ -48,3 +48,7 @@
 ## تحقق App Shell في المتصفح
 
 تم تشغيل Archive محليًا وفتح الواجهة في Chromium. ظهر اسم Archive والواجهة نفسها دون رابط خارجي، وكان `manifest.webmanifest` مرتبطًا من الصفحة، كما كان Service Worker مدعومًا ومتحكمًا بالصفحة (`serviceWorkerController: true`). وضع `standalone` لا يظهر أثناء اختبار المتصفح العادي لأنه لا يفتح كتطبيق مثبت، لكنه مضبوط في manifest.
+
+## فحص أصول Android
+
+تم إنشاء وفحص `mobile/branding/splash.png` و`mobile/branding/icon.png`. شاشة البداية تحمل Archive وMEDIA ARCHIVE بتدرجات البنفسجي والفيروزي والبرتقالي، والأيقونة مربعة عالية الدقة بخطوط أرشيفية بيضاء على خلفية ملونة. لا تحتوي الأصول على أسرار أو بيانات مستخدم.

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Archive</string>
+    <string name="title_activity_main">Archive</string>
+    <string name="package_name">com.archive.user</string>
+    <string name="custom_url_scheme">com.archive.user</string>
+</resources>

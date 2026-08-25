@@ -1,29 +1,39 @@
 {
   "name": "archive-media-platform",
-  "version": "4.0.0",
-  "description": "Production-ready media archive platform with secure admin tools and resilient PDF/video handling.",
+  "version": "5.0.0",
+  "description": "Archive media archive with secure admin tools, resilient PDF/video handling, and separate Capacitor Android User/Admin shells.",
   "main": "server-secure.js",
   "scripts": {
     "start": "node server-secure.js",
     "dev": "NODE_ENV=development node server-secure.js",
     "hash": "node scripts/hash.js",
     "genkeys": "node scripts/genkeys.js",
-    "test": "node scripts/smoke-test.js"
+    "test": "node scripts/smoke-test.js",
+    "android:prepare": "node mobile/prepare-mobile-webdirs.js",
+    "android:debug": "bash mobile/build-debug.sh"
   },
-  "engines": { "node": ">=18.0.0" },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.7.0",
-    "dotenv": "^16.4.5",
     "validator": "^13.12.0",
     "xss": "^1.0.15"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0"
   }
 }

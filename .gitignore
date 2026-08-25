@@ -5,3 +5,9 @@ node_modules/
 logs/
 .DS_Store
 npm-debug.log*
+
+# Android / Capacitor build output
+artifacts/
+mobile/*/android/.gradle/
+mobile/*/android/build/
+mobile/*/android/app/build/

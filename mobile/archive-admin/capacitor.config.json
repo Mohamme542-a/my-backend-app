@@ -1,0 +1,9 @@
+{
+  "appId": "com.archive.admin",
+  "appName": "Archive Admin",
+  "webDir": "../web-admin",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  }
+}

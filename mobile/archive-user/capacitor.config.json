@@ -1,0 +1,9 @@
+{
+  "appId": "com.archive.user",
+  "appName": "Archive",
+  "webDir": "../web-user",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  }
+}
