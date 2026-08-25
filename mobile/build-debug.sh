@@ -7,6 +7,10 @@ export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
 export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
 
 cd "$ROOT"
+if [[ -z "${CAPACITOR_API_URL:-}" ]]; then
+  echo "CAPACITOR_API_URL is required, for example: https://archive.example.com" >&2
+  exit 2
+fi
 node mobile/prepare-mobile-webdirs.js
 for app in archive-user archive-admin; do
   (cd "mobile/$app" && npx cap sync android)

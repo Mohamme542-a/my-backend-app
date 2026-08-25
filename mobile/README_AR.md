@@ -9,9 +9,10 @@
 
 ## البناء
 
-من جذر المستودع:
+من جذر المستودع، يجب تحديد عنوان خادم API قبل البناء:
 
 ```bash
+export CAPACITOR_API_URL=https://my-backend-app-ajry.onrender.com
 node mobile/prepare-mobile-webdirs.js
 (cd mobile/archive-user && npx cap sync android)
 (cd mobile/archive-admin && npx cap sync android)
@@ -24,7 +25,13 @@ export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
 (cd mobile/archive-admin/android && ./gradlew assembleDebug)
 ```
 
-تظهر النتائج في `android/app/build/outputs/apk/debug/app-debug.apk` لكل غلاف.
+تظهر النتائج في `android/app/build/outputs/apk/debug/app-debug.apk` لكل غلاف. أو استخدم الأمر الموحد:
+
+```bash
+CAPACITOR_API_URL=https://my-backend-app-ajry.onrender.com npm run android:debug
+```
+
+يرفض سكربت البناء العمل إذا لم تُحدد `CAPACITOR_API_URL`، منعًا لإنتاج نسخة تشير إلى localhost داخل الهاتف.
 
 ## الأذونات
 
