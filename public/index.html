@@ -262,7 +262,7 @@ main{padding:18px 14px;max-width:980px;margin:0 auto}
 #fap .fap-ctrls{display:flex;align-items:center;justify-content:center;gap:18px}
 #fap .fap-ctrls button{background:rgba(255,255,255,.08);border:none;color:#fff;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:.2s}
 #fap .fap-ctrls button:hover{background:rgba(255,255,255,.16)}
-#fap .fap-ctrls .fap-play{width:72px;height:72px;background:linear-gradient(135deg,#4ade80,#15803d);box-shadow:0 12px 32px rgba(34,197,94,.5)}
+#fap .fap-ctrls .fap-play{width:72px;height:72px;background:linear-gradient(135deg,#111111,#555555);box-shadow:0 12px 32px rgba(34,197,94,.5)}
 #fap .fap-ctrls .fap-play svg{width:30px;height:30px}
 
 
@@ -340,7 +340,7 @@ main{padding:18px 14px;max-width:980px;margin:0 auto}
 #mini-ap .mini-bar > div{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);width:0%}
 #mini-ap button{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.06);color:#fff;display:grid;place-items:center;cursor:pointer;transition:.15s}
 #mini-ap button:hover{background:rgba(255,255,255,.12)}
-#mini-ap button.mp{width:42px;height:42px;background:linear-gradient(135deg,#4ade80,#15803d);box-shadow:0 6px 18px rgba(34,197,94,.45)}
+#mini-ap button.mp{width:42px;height:42px;background:linear-gradient(135deg,#111111,#555555);box-shadow:0 6px 18px rgba(34,197,94,.45)}
 #mini-ap button svg{width:18px;height:18px}
 #mini-ap button.mp svg{width:20px;height:20px}
 body.has-mini .bottom-nav{box-shadow:0 -8px 24px rgba(0,0,0,.4)}
@@ -356,6 +356,16 @@ body.has-mini #app{padding-bottom:calc(160px + var(--safe-bot))}
 #fap .fap-secondary button.on{color:#4ade80;background:rgba(74,222,128,.18)}
 #fap .fap-secondary button svg{width:20px;height:20px}
 
+
+/* Archive monochrome maintenance theme */
+:root{--bg:#f5f5f3!important;--surface:#ffffff!important;--surface-2:#eeeeeb!important;--surface-3:#deded9!important;--line:rgba(0,0,0,.10)!important;--line-2:rgba(0,0,0,.20)!important;--text:#0b0b0b!important;--muted:#5b5b59!important;--dim:#858581!important;--red:#111111!important;--red-2:#333333!important;--green:#111111!important;--amber:#333333!important;--grad:linear-gradient(135deg,#050505,#4a4a47)!important;--shadow:0 14px 34px rgba(0,0,0,.12)!important}
+html,body{background:var(--bg)!important;color:var(--text)!important}body::before{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(245,245,243,.72))!important}
+.brand,.splash-brand,.dh-title,.h-brand{color:#090909!important;background:none!important;-webkit-text-fill-color:#090909!important}
+button,.nav-btn,.play-green,.fap-play,.pdf-btn.primary{background:#111!important;color:#fff!important;border-color:#111!important;box-shadow:0 8px 20px rgba(0,0,0,.16)!important}
+.card,.post-card,.section-card,.owner-card,.media-slot,.audio-card,.fap,.mini-ap,.drawer,.modal-content{background:#fff!important;border-color:rgba(0,0,0,.12)!important;box-shadow:0 12px 28px rgba(0,0,0,.10)!important}
+input,textarea,select{background:#fafaf8!important;color:#111!important;border-color:rgba(0,0,0,.18)!important}
+.badge,.tag,.pill{background:#e8e8e4!important;color:#111!important}.api-pill{background:#fff!important;color:#444!important;border-color:rgba(0,0,0,.16)!important}
+.splash{background:#f5f5f3!important}.splash .splash-logo{box-shadow:0 14px 30px rgba(0,0,0,.16)!important}
 </style>
 </head>
 <body>
@@ -526,6 +536,7 @@ body.has-mini #app{padding-bottom:calc(160px + var(--safe-bot))}
 </div>
 
 <script src="/api-config.js"></script>
+<script src="/native-audio-bridge.js"></script>
 <script>
 /* ============================================================
    Archive — Frontend v3.0 (Media platform)
@@ -1073,7 +1084,7 @@ function renderPost(p){
       slot.classList.add('audio-card');
       const aid = 'a_'+Math.random().toString(36).slice(2,8);
       slot.innerHTML = `<div class="an-row" style="padding:6px 4px">
-        <div class="an-cover" style="background:${m.poster||m.thumb||p.coverUrl?`url('${esc(m.poster||m.thumb||p.coverUrl)}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)'}"></div>
+        <div class="an-cover" style="background:${m.poster||m.thumb||p.coverUrl?`url('${esc(m.poster||m.thumb||p.coverUrl)}') center/cover`:'linear-gradient(135deg,#111111,#555555)'}"></div>
         <div class="an-info"><h4>${esc(m.caption||p.title||'تسجيل صوتي')}</h4><p>اضغط لتشغيل ملء الشاشة</p></div>
         <button class="play-green" data-fap='${esc(JSON.stringify({url:normalizeMediaUrl(m.url, { type:'audio', mime:m.mime || '' }),title:m.caption||p.title||'تسجيل',artist:'',cover:m.poster||m.thumb||p.coverUrl||''}))}' aria-label="تشغيل">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -1245,7 +1256,7 @@ function renderMediaSlot(m){
   } else if (type === 'audio'){
     slot.classList.add('audio-card');
     slot.innerHTML = `<div class="an-row" style="padding:6px 4px">
-      <div class="an-cover" style="background:${m.poster||m.thumb?`url('${esc(m.poster||m.thumb)}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)'}"></div>
+      <div class="an-cover" style="background:${m.poster||m.thumb?`url('${esc(m.poster||m.thumb)}') center/cover`:'linear-gradient(135deg,#111111,#555555)'}"></div>
       <div class="an-info"><h4>${esc(m.caption||'تسجيل صوتي')}</h4><p>اضغط لتشغيل ملء الشاشة</p></div>
       <button class="play-green" data-fap='${esc(JSON.stringify({url:normalizeMediaUrl(m.url, { type:'audio', mime:m.mime || '' }),title:m.caption||'تسجيل',artist:'',cover:m.poster||m.thumb||''}))}' aria-label="تشغيل">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -1397,7 +1408,7 @@ async function loadOwner(){
       ? `<div class="owner-intro" style="margin-top:18px"></div>`
       : '';
     card.innerHTML = `
-      ${o.photoUrl ? `<img src="${esc(o.photoUrl)}" alt="">` : ''}
+      <img src="${esc(o.photoUrl || '/icons/archive.svg')}" alt="" onerror="this.onerror=null;this.src='/icons/archive.svg'">
       <h2>${esc(o.name||cfg.brandName||DEFAULT_APP_NAME)}</h2>
       <p>${esc(o.bio||'منصة وسائط احترافية')}</p>
       <div class="owner-links">${socialEntries}</div>
@@ -1422,7 +1433,49 @@ const fap = {
     this.load(track);
     this.el.classList.add('show');
   },
-  load(t){
+  async load(t){
+    const native = window.archiveNativeAudio;
+    $('#fap-title').textContent = t.title||'—';
+    $('#fap-artist').textContent = t.artist||'';
+    $('#fap-cover').style.background = t.cover?`url('${t.cover}') center/cover`:'linear-gradient(135deg,#111111,#555555)';
+    this.updateMini();
+
+    if (native?.available) {
+      try {
+        if (this.audio) { this.audio.pause(); this.audio = null; }
+        this.nativeId = true;
+        native.onComplete = () => this.next();
+        native.onState = event => {
+          if (event && typeof event.isPlaying === 'boolean') {
+            this.playing = event.isPlaying;
+            this.setIcon(); this.syncMiniIcon();
+            $('#fap-cover').classList.toggle('spin', this.playing);
+          }
+        };
+        await native.play({
+          url: normalizeMediaUrl(t.url, { type:'audio' }),
+          title: t.title || 'تشغيل صوتي',
+          artist: t.artist || 'Archive',
+          cover: t.cover || '',
+        });
+        this.playing = true; this.setIcon(); this.syncMiniIcon(); $('#fap-cover').classList.add('spin');
+        clearInterval(this.nativeTimer);
+        this.nativeTimer = setInterval(async () => {
+          if (!this.nativeId) return;
+          const p = await native.position();
+          const cur = Number(p.currentTime || 0), dur = Number(p.duration || 0);
+          $('#fap-cur').textContent = this.fmt(cur); $('#fap-dur').textContent = this.fmt(dur);
+          $('#fap-played').style.transform = `scaleX(${dur ? cur/dur : 0})`;
+          const mp = document.getElementById('mini-prog'); if (mp) mp.style.width = (dur ? cur/dur*100 : 0) + '%';
+        }, 500);
+        return;
+      } catch (e) {
+        console.warn('native audio unavailable', e);
+        this.nativeId = false;
+        toast('تعذر تشغيل المشغل الأصلي؛ جارٍ استخدام المشغل العادي','error');
+      }
+    }
+
     if (!this.audio){
       this.audio = new Audio();
       this.audio.crossOrigin = 'anonymous';
@@ -1433,10 +1486,8 @@ const fap = {
       this.audio.addEventListener('pause', () => { this.playing=false; this.setIcon(); this.syncMiniIcon(); $('#fap-cover').classList.remove('spin'); });
       this.audio.addEventListener('error', () => toast('فشل تشغيل الأنشودة','error'));
     }
-      this.audio.src = normalizeMediaUrl(t.url, { type:'audio' });
-    $('#fap-title').textContent = t.title||'—';
-    $('#fap-artist').textContent = t.artist||'';
-    $('#fap-cover').style.background = t.cover?`url('${t.cover}') center/cover`:'linear-gradient(135deg,#22c55e,#15803d)';
+    this.nativeId = false;
+    this.audio.src = normalizeMediaUrl(t.url, { type:'audio' });
     this.audio.play().catch(()=>{});
     this.updateMini();
   },
@@ -1454,10 +1505,19 @@ const fap = {
     $('#fap-played').style.transform = `scaleX(${d?c/d:0})`;
     const mp = document.getElementById('mini-prog'); if (mp) mp.style.width = (d?(c/d)*100:0) + '%';
   },
-  prev(){ if (this.idx > 0) { this.idx--; this.load(this.playlist[this.idx]); } else if (this.audio) { this.audio.currentTime = 0; } },
+  prev(){
+    if (this.idx > 0) { this.idx--; this.load(this.playlist[this.idx]); }
+    else if (this.nativeId) { window.archiveNativeAudio.seek(0).catch(()=>{}); }
+    else if (this.audio) { this.audio.currentTime = 0; }
+  },
   next(){
-    if (this.repeat && this.audio) { this.audio.currentTime = 0; this.audio.play().catch(()=>{}); return; }
+    if (this.repeat) {
+      if (this.nativeId) this.load(this.playlist[this.idx]);
+      else if (this.audio) { this.audio.currentTime = 0; this.audio.play().catch(()=>{}); }
+      return;
+    }
     if (this.idx < this.playlist.length-1) { this.idx++; this.load(this.playlist[this.idx]); }
+    else if (this.nativeId) { this.stop(); }
     else if (this.audio) { this.audio.pause(); }
   },
   toggleRepeat(){ this.repeat = !this.repeat; this.syncRepeatUI(); },
@@ -1479,7 +1539,13 @@ const fap = {
   minimize(){ this.el.classList.remove('show'); /* audio keeps playing; mini bar stays */ },
   stop(){
     this.el.classList.remove('show');
+    if (this.nativeId) {
+      window.archiveNativeAudio.stop().catch(()=>{});
+      this.nativeId = false;
+      clearInterval(this.nativeTimer);
+    }
     if (this.audio){ this.audio.pause(); this.audio.currentTime = 0; }
+    this.playing = false; this.setIcon(); this.syncMiniIcon();
     cancelAnimationFrame(this.raf);
     const m = document.getElementById('mini-ap'); if (m) m.classList.remove('show');
     document.body.classList.remove('has-mini');
@@ -1490,7 +1556,7 @@ const fap = {
     m.classList.add('show'); document.body.classList.add('has-mini');
     document.getElementById('mini-title').textContent = t.title || '—';
     document.getElementById('mini-artist').textContent = t.artist || '';
-    document.getElementById('mini-cover').style.background = t.cover ? `url('${t.cover}') center/cover` : 'linear-gradient(135deg,#22c55e,#15803d)';
+    document.getElementById('mini-cover').style.background = t.cover ? `url('${t.cover}') center/cover` : 'linear-gradient(135deg,#111111,#555555)';
     this.syncMiniIcon();
   },
   syncMiniIcon(){
@@ -1521,7 +1587,7 @@ const fap = {
         for (let i=0;i<bars;i++){
           const h = (data[i]/255)*cv.height;
           const g = c2.createLinearGradient(0, cv.height-h, 0, cv.height);
-          g.addColorStop(0,'#4ade80'); g.addColorStop(1,'#15803d');
+          g.addColorStop(0,'#111111'); g.addColorStop(1,'#777777');
           c2.fillStyle = g;
           c2.fillRect(i*bw+1, cv.height-h, bw-2, h);
         }
@@ -1534,13 +1600,31 @@ const fap = {
 };
 window.fap = fap;
 $('#fap-close').addEventListener('click', () => fap.close());
-$('#fap-play').addEventListener('click', () => { if (!fap.audio) return; fap.audio.paused?fap.audio.play():fap.audio.pause(); });
-$('#fap-back').addEventListener('click', () => { if (fap.audio) fap.audio.currentTime = Math.max(0, fap.audio.currentTime-10); });
-$('#fap-fwd').addEventListener('click',  () => { if (fap.audio) fap.audio.currentTime = Math.min(fap.audio.duration||0, fap.audio.currentTime+10); });
+$('#fap-play').addEventListener('click', () => {
+  if (fap.nativeId) { fap.playing ? window.archiveNativeAudio.pause() : window.archiveNativeAudio.resume(); return; }
+  if (fap.audio) fap.audio.paused ? fap.audio.play() : fap.audio.pause();
+});
+$('#fap-back').addEventListener('click', () => {
+  if (fap.nativeId) window.archiveNativeAudio.position().then(p => window.archiveNativeAudio.seek(Math.max(0, Number(p.currentTime || 0)-10))).catch(()=>{});
+  else if (fap.audio) fap.audio.currentTime = Math.max(0, fap.audio.currentTime-10);
+});
+$('#fap-fwd').addEventListener('click',  () => {
+  if (fap.nativeId) window.archiveNativeAudio.position().then(p => window.archiveNativeAudio.seek(Math.min(Number(p.duration || 0), Number(p.currentTime || 0)+10))).catch(()=>{});
+  else if (fap.audio) fap.audio.currentTime = Math.min(fap.audio.duration||0, fap.audio.currentTime+10);
+});
 (() => {
   const prog = $('#fap-prog');
   const seek = e => {
-    if (!fap.audio || !isFinite(fap.audio.duration)) return;
+          if (fap.nativeId) {
+        const r = prog.getBoundingClientRect();
+        const x = (e.touches?e.touches[0]:e).clientX;
+        let ratio = (x-r.left)/r.width;
+        if (document.documentElement.dir==='rtl') ratio = 1-ratio;
+        window.archiveNativeAudio.position().then(p => window.archiveNativeAudio.seek(Math.max(0, Math.min(1, ratio)) * Number(p.duration || 0))).catch(()=>{});
+        return;
+      }
+      if (!fap.audio || !isFinite(fap.audio.duration)) return;
+
     const r = prog.getBoundingClientRect();
     const x = (e.touches?e.touches[0]:e).clientX;
     let ratio = (x-r.left)/r.width;
@@ -1565,6 +1649,7 @@ $('#fap-fwd').addEventListener('click',  () => { if (fap.audio) fap.audio.curren
   // Mini bar interactions
   $r('mini-play')  && $r('mini-play').addEventListener('click', (e) => {
     e.stopPropagation();
+    if (fap.nativeId) { fap.playing ? window.archiveNativeAudio.pause() : window.archiveNativeAudio.resume(); return; }
     if (!fap.audio) return;
     fap.audio.paused ? fap.audio.play() : fap.audio.pause();
   });
@@ -1626,7 +1711,8 @@ async function applyTheme(){
     const cfg = await fetch(API+'/api/app-config').then(r=>r.json()).catch(()=>null);
     applyBranding(cfg || {});
     applyFont(cfg || {});
-    const t = cfg && cfg.theme; if (!t) return;
+    // Archive uses a deliberate monochrome visual system; remote theme colors are ignored.
+    return;
     const r = document.documentElement.style;
     if (t.primary)     r.setProperty('--red', t.primary);
     if (t.primary2)    r.setProperty('--red-2', t.primary2);
@@ -1656,14 +1742,14 @@ async function checkAppStatus(){
     const r = await fetch(API+'/api/app-status').then(r=>r.json()).catch(()=>null);
     if (r && r.disabled){
       const hasUpdate = !!r.updateUrl;
-      const defaultMsg = hasUpdate 
+      const defaultMsg = hasUpdate
         ? 'التطبيق متوقف من قبل المسؤول. يمكنك تحميل التحديث الجديد.'
         : 'تم إيقاف التطبيق بسبب عطل فني. سيتم إصلاحه قريباً إن شاء الله. شكراً لصبركم.';
       $('#blocked-msg').textContent = r.message || defaultMsg;
       const updateBtn = $('#blocked-update');
-      if (hasUpdate){ 
-        updateBtn.href = r.updateUrl; 
-        updateBtn.style.display='inline-block'; 
+      if (hasUpdate){
+        updateBtn.href = r.updateUrl;
+        updateBtn.style.display='inline-block';
         updateBtn.textContent = 'تحميل التحديث';
       } else {
         updateBtn.style.display='none';

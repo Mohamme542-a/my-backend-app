@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
+    "@capacitor/browser": "^8.0.4",
     "@capacitor/core": "^8.5.0",
+    "@capgo/capacitor-native-audio": "^8.4.21",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",

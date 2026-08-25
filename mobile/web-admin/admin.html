@@ -162,6 +162,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 .stat{box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.04)}
 .drop{box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
 
+
+/* Archive monochrome maintenance theme */
+:root{--bg:#f5f5f3!important;--surface:#ffffff!important;--surface-2:#eeeeeb!important;--surface-3:#deded9!important;--line:rgba(0,0,0,.10)!important;--line-2:rgba(0,0,0,.20)!important;--text:#0b0b0b!important;--muted:#5b5b59!important;--dim:#858581!important;--red:#111111!important;--red-2:#333333!important;--green:#111111!important;--amber:#333333!important;--grad:linear-gradient(135deg,#050505,#4a4a47)!important;--shadow:0 14px 34px rgba(0,0,0,.12)!important}
+html,body{background:var(--bg)!important;color:var(--text)!important}body::before{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(245,245,243,.72))!important}
+button,.btn,.tab.active{background:#111!important;color:#fff!important;border-color:#111!important;box-shadow:0 8px 20px rgba(0,0,0,.14)!important}.btn.danger{background:#e8e8e4!important;color:#111!important;border-color:#111!important}
+.card,.item,.chip,.stat,.drop,.modal .body{background:#fff!important;color:#111!important;border-color:rgba(0,0,0,.12)!important;box-shadow:0 12px 28px rgba(0,0,0,.10)!important}
+input,textarea,select{background:#fafaf8!important;color:#111!important;border-color:rgba(0,0,0,.18)!important}.api-pill{background:#fff!important;color:#444!important;border-color:rgba(0,0,0,.16)!important}
+.h-brand{background:none!important;color:#090909!important;-webkit-text-fill-color:#090909!important}.drop:hover,.drop.over{background:#f1f1ee!important;border-color:#111!important}
 </style>
 </head>
 <body>
@@ -491,17 +499,17 @@ function toast(msg, kind){
 }
 
 /* ===== JWT + CSRF auth bootstrap (FIXED) ===== */
-function getAccess(){ 
-  return localStorage.getItem('admin_access') || sessionStorage.getItem('admin_access') || ''; 
+function getAccess(){
+  return localStorage.getItem('admin_access') || sessionStorage.getItem('admin_access') || '';
 }
-function setAccess(t){ 
-  if (t) { 
-    localStorage.setItem('admin_access', t); 
-    sessionStorage.setItem('admin_access', t); 
-  } else { 
-    localStorage.removeItem('admin_access'); 
-    sessionStorage.removeItem('admin_access'); 
-  } 
+function setAccess(t){
+  if (t) {
+    localStorage.setItem('admin_access', t);
+    sessionStorage.setItem('admin_access', t);
+  } else {
+    localStorage.removeItem('admin_access');
+    sessionStorage.removeItem('admin_access');
+  }
 }
 function getCsrf(){ return sessionStorage.getItem('admin_csrf') || ''; }
 function setCsrf(t){ if (t) sessionStorage.setItem('admin_csrf', t); }
@@ -518,27 +526,27 @@ async function tryRefresh(){
   if (!token) return false;
   try {
     const r = await fetch(API+'/api/admin/auth/refresh', {
-      method:'POST', 
-      credentials:'include', 
-      headers: { 
+      method:'POST',
+      credentials:'include',
+      headers: {
         'Authorization': 'Bearer ' + token,
-        'X-CSRF-Token': getCsrf() 
+        'X-CSRF-Token': getCsrf()
       },
     });
     if (!r.ok) return false;
     const j = await r.json();
-    if (j && j.accessToken){ 
-      setAccess(j.accessToken); 
+    if (j && j.accessToken){
+      setAccess(j.accessToken);
       if (j.csrfToken) setCsrf(j.csrfToken);
-      return true; 
+      return true;
     }
     return false;
   } catch { return false; }
 }
 
-function goLogin(){ 
-  setAccess(''); 
-  location.replace('/admin-login.html'); 
+function goLogin(){
+  setAccess('');
+  location.replace('/admin-login.html');
 }
 
 // Enhanced token validation
@@ -557,10 +565,10 @@ async function validateToken(token) {
 // Check token on load with retry
 (async () => {
   await bootstrapCsrf();
-  
+
   // Small delay to ensure localStorage is ready
   await new Promise(r => setTimeout(r, 50));
-  
+
   // تأخير بسيط والتحقق من صحة التوكن مع الخادم
 await new Promise(r => setTimeout(r, 100));
 let token = getAccess();
@@ -581,7 +589,7 @@ try {
   goLogin();
   return;
                           }
-  
+
   const isValid = await validateToken(token);
   if (!isValid) {
     // Try to refresh
@@ -591,9 +599,9 @@ try {
       return;
     }
   }
-  
+
   // Token is valid, continue
-  const apiUrlEl = $('#api-url'); 
+  const apiUrlEl = $('#api-url');
   if (apiUrlEl) apiUrlEl.textContent = API.replace(/^https?:\/\//,'');
   fetch(API+'/healthz').then(r=>r.json())
     .then(()=>{ const s=$('#api-status'); if (s){ s.className='ok'; s.textContent='● متصل'; } })
@@ -608,14 +616,14 @@ async function api(path, opts={}){
   let token = getAccess();
   if (token) headers['authorization'] = 'Bearer ' + token;
   if (method !== 'GET' && method !== 'HEAD') headers['x-csrf-token'] = getCsrf();
-  
+
   const doFetch = () => fetch(API+path, {
     method, headers, credentials:'include',
     body: opts.body ? JSON.stringify(opts.body) : undefined, cache:'no-store',
   });
-  
+
   let r = await doFetch();
-  
+
   if (r.status === 401) {
     const ok = await tryRefresh();
     if (!ok) { goLogin(); throw new Error('401'); }
@@ -624,15 +632,15 @@ async function api(path, opts={}){
     r = await doFetch();
     if (r.status === 401) { goLogin(); throw new Error('401'); }
   }
-  
+
   if (r.status === 403) {
     await bootstrapCsrf();
     headers['x-csrf-token'] = getCsrf();
     r = await doFetch();
   }
-  
+
   if (!r.ok) {
-    let err = ''; 
+    let err = '';
     try { err = (await r.json()).error || ''; } catch {}
     throw new Error(`${r.status} ${err}`);
   }
@@ -1105,7 +1113,7 @@ async function refreshPostSectionSelect(){
     const sel = $('#p-section');
     if (!sel) return;
     const current = sel.value;
-    sel.innerHTML = '<option value="">— بدون قسم محدد —</option>' + 
+    sel.innerHTML = '<option value="">— بدون قسم محدد —</option>' +
       (items||[]).map(s => `<option value="${esc(s.id)}">${esc(s.name||'قسم')}</option>`).join('');
     if (current) sel.value = current;
   } catch {}
@@ -1177,14 +1185,14 @@ $('#a-save').addEventListener('click', async () => {
   const cover = $('#a-cover').value.trim();
   const url = $('#a-url').value.trim();
   const type = ($('#a-type') && $('#a-type').value) || 'audio';
-  const body = { 
-    title:$('#a-title').value.trim(), 
-    artist:$('#a-artist').value.trim(), 
+  const body = {
+    title:$('#a-title').value.trim(),
+    artist:$('#a-artist').value.trim(),
     url, audioUrl: url,
     type,
     mime: window.__lastUploadedMime || '',
-    coverUrl:cover, 
-    sectionId:$('#a-section').value||null 
+    coverUrl:cover,
+    sectionId:$('#a-section').value||null
   };
   if (!body.title || !url) return toast('العنوان والرابط مطلوبان','err');
   try {
@@ -1455,10 +1463,10 @@ if (origSaveCfg) {
 }
 
 /* Boot */
-(async () => { 
-  renderChips(); 
-  await loadStats(); 
-  await loadPosts(); 
+(async () => {
+  renderChips();
+  await loadStats();
+  await loadPosts();
 })();
 </script>
 </body>

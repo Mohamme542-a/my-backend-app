@@ -1,8 +1,8 @@
 /* Archive User App Shell: no admin routes or admin UI are bundled here. */
-const VERSION = 'archive-user-v1';
+const VERSION = 'archive-user-v2-maintenance';
 const STATIC = `${VERSION}-static`;
 const RUNTIME = `${VERSION}-runtime`;
-const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/icons/archive.svg', '/icons/archive-192.png', '/icons/archive-512.png'];
+const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/api-config.js', '/native-audio-bridge.js', '/external-links.js', '/icons/archive.svg', '/icons/archive-192.png', '/icons/archive-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(STATIC).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));

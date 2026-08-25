@@ -28,6 +28,8 @@ reset(userDir);
 reset(adminDir);
 
 copy(path.join(publicDir, 'index.html'), path.join(userDir, 'index.html'));
+copy(path.join(publicDir, 'native-audio-bridge.js'), path.join(userDir, 'native-audio-bridge.js'));
+copy(path.join(publicDir, 'external-links.js'), path.join(userDir, 'external-links.js'));
 copy(path.join(__dirname, 'user-sw.js'), path.join(userDir, 'sw.js'));
 copy(path.join(publicDir, 'manifest.webmanifest'), path.join(userDir, 'manifest.webmanifest'));
 writeApiConfig(userDir);
@@ -35,7 +37,8 @@ copy(path.join(publicDir, 'icons', 'archive.svg'), path.join(userDir, 'icons', '
 copy(path.join(publicDir, 'icons', 'archive-192.png'), path.join(userDir, 'icons', 'archive-192.png'));
 copy(path.join(publicDir, 'icons', 'archive-512.png'), path.join(userDir, 'icons', 'archive-512.png'));
 
-copy(path.join(publicDir, 'admin-login.html'), path.join(adminDir, 'index.html'));
+// Admin APK opens the console directly. The console still redirects to login when no valid session exists.
+copy(path.join(publicDir, 'admin.html'), path.join(adminDir, 'index.html'));
 copy(path.join(publicDir, 'admin-login.html'), path.join(adminDir, 'admin-login.html'));
 copy(path.join(publicDir, 'admin.html'), path.join(adminDir, 'admin.html'));
 copy(path.join(publicDir, 'manifest.webmanifest'), path.join(adminDir, 'manifest.webmanifest'));

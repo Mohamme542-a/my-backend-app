@@ -44,3 +44,11 @@
 - [Capacitor Android Documentation](https://capacitorjs.com/docs/android)
 - [Capacitor Workflow](https://capacitorjs.com/docs/basics/workflow)
 - [Android CLI Download](https://developer.android.com/tools/agents/android-cli/download)
+
+## صيانة الإصدار الأسود والأبيض والصوت الخلفي
+
+أعيدت ألوان واجهة User وAdmin ودخول الإدارة إلى نظام أبيض وأسود، واستُبدل شعار Archive الملون بنسخة أحادية مناسبة للأيقونة وشاشة البداية والأغلفة الافتراضية. كما أصبح APK Admin يبدأ من لوحة الإدارة مباشرة؛ تبقى حماية API فعالة، وإذا لم توجد جلسة محفوظة يعرض التطبيق شاشة الدخول تلقائيًا، ثم يحفظ جلسة الدخول محليًا للتشغيلات التالية.
+
+أضيف Native Audio لنسخة User مع خدمة Android أمامية وإشعار تشغيل، وطلب صلاحية الإشعارات على Android 13+، وصلاحيات `FOREGROUND_SERVICE` و`FOREGROUND_SERVICE_MEDIA_PLAYBACK` و`WAKE_LOCK`. أضيف Browser لفتح الروابط الخارجية من Android. لا تحتاج نسخة Admin إلى أذونات الصوت أو الإشعارات.
+
+التحقق الأخير: نجح فحص JavaScript المضمّن، و`npm test`، ومزامنة Capacitor، وبناء User وAdmin عبر Gradle، وتوقيع APK. يحتوي User على أذونات الإنترنت والتشغيل الخلفي والإشعار فقط، بينما يحتوي Admin على الإنترنت فقط. لم يتم اختبار الإشعار على جهاز Android فعلي لعدم وجود جهاز متصل ببيئة البناء؛ يحتاج التحقق النهائي على الهاتف إلى تشغيل أنشودة ثم إغلاق التطبيق والتأكد من ظهور إشعار Archive.
