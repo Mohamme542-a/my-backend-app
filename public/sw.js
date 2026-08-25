@@ -2,7 +2,7 @@
 const VERSION   = 'archive-v5.0';
 const STATIC    = `${VERSION}-static`;
 const RUNTIME   = `${VERSION}-runtime`;
-const PRECACHE  = ['/', '/index.html', '/admin-login.html'];
+const PRECACHE  = ['/', '/index.html', '/admin-login.html', '/manifest.webmanifest', '/icons/archive.svg', '/icons/archive-192.png', '/icons/archive-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(STATIC).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
@@ -26,6 +26,12 @@ self.addEventListener('fetch', (e) => {
       url.pathname.startsWith('/api/admin') ||
       url.pathname.startsWith('/api/stream') ||
       url.pathname.startsWith('/api/csrf')) return;
+
+  // App navigation: keep the local shell available when the network is unavailable.
+  if (req.mode === 'navigate') {
+    e.respondWith(fetch(req).catch(() => caches.match('/index.html')));
+    return;
+  }
 
   // Network-first for public API.
   if (url.pathname.startsWith('/api/')) {
