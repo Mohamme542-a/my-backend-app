@@ -19,6 +19,10 @@
         border-radius:18px;padding:28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
   h1{margin:0 0 4px;font-size:22px}
   .sub{color:#9b9bab;margin:0 0 22px;font-size:13px}
+  .api-box{margin:0 0 16px;padding:12px;border:1px solid #2e2e3c;border-radius:12px;background:#11111a}
+  .api-box label{margin:0 0 6px;font-size:12px;color:#cfcfdc}
+  .api-row{display:flex;gap:7px}.api-row input{min-width:0;padding:9px 10px;font-size:12px}.api-row button{width:auto;margin:0;padding:9px 12px;font-size:12px;white-space:nowrap}
+  .api-help{display:block;margin-top:7px;color:#7a7a8d;font-size:11px;line-height:1.5}
   label{display:block;font-size:13px;margin:14px 0 6px;color:#cfcfdc}
   input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #2e2e3c;
         background:#0f0f17;color:#fff;font:inherit;outline:none}
@@ -34,6 +38,11 @@
   <form class="card" id="f" autocomplete="off">
     <h1>Archive · لوحة الإدارة</h1>
     <p class="sub">يجب تسجيل الدخول للوصول إلى أي عملية إدارية.</p>
+    <div class="api-box">
+      <label for="api-origin">عنوان خادم API</label>
+      <div class="api-row"><input id="api-origin" type="url" inputmode="url" placeholder="https://خادم-archive.example"><button id="save-api" type="button">حفظ وتجربة</button></div>
+      <small class="api-help">داخل APK لا يعني localhost خادمك. ضع عنوان خادم Archive المنشور أو عنوان جهازك في الشبكة، ثم اضغط حفظ وتجربة.</small>
+    </div>
     <label for="u">اسم المستخدم</label>
     <input id="u" name="username" required minlength="3" maxlength="32" autocomplete="username">
     <label for="p">كلمة المرور</label>
@@ -42,12 +51,30 @@
     <div id="err" class="err" role="alert" aria-live="polite"></div>
     <div class="foot">جميع المحاولات يتم تسجيلها مع IP و User-Agent.</div>
   </form>
+<script src="/api-config.js"></script>
 <script>
+const API = (window.__ARCHIVE_API__ || window.__API__ || location.origin).replace(/\/+$/,'');
+const apiInput = document.getElementById('api-origin');
+if (apiInput) apiInput.value = API === location.origin ? '' : API;
+function validApiOrigin(value) {
+  try {
+    const u = new URL(value);
+    if (!['http:', 'https:'].includes(u.protocol)) return false;
+    if (u.protocol === 'http:' && !/^(localhost|127\\.0\\.0\\.1|10\\.0\\.2\\.2)$/i.test(u.hostname)) return false;
+    return !u.pathname || u.pathname === '/';
+  } catch { return false; }
+}
+document.getElementById('save-api')?.addEventListener('click', () => {
+  const value = apiInput?.value.trim().replace(/\\/+$/,'') || '';
+  if (!validApiOrigin(value)) { document.getElementById('err').textContent = 'اكتب عنوان API صحيحًا؛ HTTPS مطلوب للخادم المنشور.'; return; }
+  localStorage.setItem('archive_api_url', value);
+  window.location.reload();
+});
 (async () => {
   // Bootstrap CSRF token
   let csrf = '';
   try {
-    const r = await fetch('/api/csrf', { credentials: 'include' });
+    const r = await fetch(API + '/api/csrf', { credentials: 'include', cache: 'no-store' });
     csrf = (await r.json()).csrfToken || '';
   } catch {}
 
@@ -60,7 +87,7 @@
     err.textContent = '';
     btn.disabled = true; btn.textContent = 'جاري التحقق...';
     try {
-      const r = await fetch('/api/admin/auth/login', {
+      const r = await fetch(API + '/api/admin/auth/login', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf },

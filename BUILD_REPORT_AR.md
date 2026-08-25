@@ -21,9 +21,15 @@
 
 تم فحص محتوى HTML وService Worker داخل APK بحثًا عن `JWT_ACCESS_SECRET` و`JWT_REFRESH_SECRET` و`CSRF_SECRET` و`COOKIE_SECRET` و`FIREBASE_AUTH_TOKEN` و`CLOUDINARY_API_SECRET` و`ADMIN_PASSWORD_HASH` والمفتاح القديم لخدمة الرفع، ولم تُعثر على هذه القيم. كما أزيلت القيم الثابتة القديمة من `.env.example` واستُبدلت بـ placeholders.
 
+## إصلاح اتصال WebView بالـ API
+
+كانت المشكلة أن صفحة Admin تستخدم `location.origin` وطلبات نسبية؛ داخل Capacitor هذا يعني أصل WebView المحلي `https://localhost` وليس خادم Archive. تم إصلاح ذلك بإضافة `api-config.js` مع عنوان قابل للحفظ من شاشة الدخول، وتغيير الطلبات إلى عنوان API المطلق، وإضافة `admin-login.html` إلى حزمة Admin حتى يعمل الرجوع بعد انتهاء الجلسة. كما سُمح لأصل Capacitor المعروف `https://localhost` في CORS فقط، وضُبطت كوكيّات CSRF والتجديد إلى `SameSite=None; Secure` لهذا الأصل مع إبقاء سياسة المتصفح العادي أكثر تشددًا.
+
+داخل APK Admin يكتب المدير عنوان خادم Archive في خانة «عنوان خادم API» ثم يضغط «حفظ وتجربة». لا يوجد عنوان مخترع أو سر ثابت داخل APK. في Android Emulator استخدم `http://10.0.2.2:PORT` للاختبار المحلي، وفي الاستخدام الحقيقي استخدم عنوان HTTPS المنشور.
+
 ## الاختبارات
 
-نجح `npm test`، وفحص بنية JavaScript، و`git diff --check`، ومزامنة Capacitor، وبناء Gradle للنسختين، وفحص manifest وpackage IDs والأذونات وتوقيع APK. لم يكن هناك جهاز Android فعلي أو Emulator متصل داخل بيئة البناء، لذلك لم يُنفذ تثبيت ميداني؛ APKات الناتجة Debug وجاهزة للتثبيت على جهاز Android متوافق.
+نجح `npm test`، وفحص بنية JavaScript، و`git diff --check`، ومزامنة Capacitor، وبناء Gradle للنسختين، وفحص manifest وpackage IDs والأذونات وتوقيع APK. واختُبرت دورة Origin `https://localhost` محليًا: `/api/csrf` أعاد CORS وCSRF cookie، وتسجيل دخول تجريبي أعاد access token، ثم نجح `/api/admin/auth/me`. لم يكن هناك جهاز Android فعلي أو Emulator متصل داخل بيئة البناء، لذلك لم يُنفذ تثبيت ميداني؛ APKات الناتجة Debug وجاهزة للتثبيت على جهاز Android متوافق.
 
 ## ملاحظة التشغيل
 
