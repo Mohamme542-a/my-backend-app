@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="/icons/archive-192.png">
+<link rel="preload" as="image" href="/icons/archive-mark.png">
 <title>Archive — مكتبة الوسائط</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -357,11 +358,13 @@ body.has-mini #app{padding-bottom:calc(160px + var(--safe-bot))}
 #fap .fap-secondary button svg{width:20px;height:20px}
 
 
+.archive-home-hero{display:flex;align-items:center;gap:14px;margin:12px 0 18px;padding:18px;border:1px solid rgba(0,0,0,.12);border-radius:22px;background:linear-gradient(135deg,#fff,#efefec);box-shadow:0 16px 34px rgba(0,0,0,.09)}.archive-home-hero .hero-mark{width:62px;height:62px;border-radius:18px;background:#111;object-fit:cover;flex:none}.archive-home-hero .hero-copy{min-width:0}.archive-home-hero .hero-kicker{font-size:10px;letter-spacing:.14em;font-weight:900;color:#70706b}.archive-home-hero h1{font-family:'Reem Kufi',sans-serif;font-size:22px;margin:3px 0}.archive-home-hero p{font-size:12px;color:var(--muted);line-height:1.65}.archive-home-hero .hero-count{margin-inline-start:auto;min-width:48px;height:48px;border-radius:15px;background:#111;color:#fff;display:grid;place-items:center;font-size:11px;text-align:center;font-weight:800}.archive-home-hero .hero-count strong{display:block;font-size:18px}.search{border:1px solid rgba(0,0,0,.14)!important;box-shadow:0 10px 24px rgba(0,0,0,.06)!important;background:#fff!important}.brand-logo,.splash-logo{object-fit:cover;border-radius:11px}.bottom-nav{backdrop-filter:blur(12px)}
+
 /* Archive monochrome maintenance theme */
-:root{--bg:#f5f5f3!important;--surface:#ffffff!important;--surface-2:#eeeeeb!important;--surface-3:#deded9!important;--line:rgba(0,0,0,.10)!important;--line-2:rgba(0,0,0,.20)!important;--text:#0b0b0b!important;--muted:#5b5b59!important;--dim:#858581!important;--red:#111111!important;--red-2:#333333!important;--green:#111111!important;--amber:#333333!important;--grad:linear-gradient(135deg,#050505,#4a4a47)!important;--shadow:0 14px 34px rgba(0,0,0,.12)!important}
-html,body{background:var(--bg)!important;color:var(--text)!important}body::before{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(245,245,243,.72))!important}
+:root{--bg:#f6f2eb!important;--surface:#fffdf8!important;--surface-2:#f0ece4!important;--surface-3:#e5dfd5!important;--line:rgba(18,18,18,.10)!important;--line-2:rgba(18,18,18,.20)!important;--text:#121212!important;--muted:#62615d!important;--dim:#89857e!important;--red:#173c8f!important;--red-2:#255bc7!important;--green:#173c8f!important;--amber:#62502a!important;--grad:linear-gradient(135deg,#121212,#173c8f)!important;--shadow:0 14px 34px rgba(18,18,18,.12)!important}
+html,body{background:var(--bg)!important;color:var(--text)!important}body::before{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(246,242,235,.78))!important}
 .brand,.splash-brand,.dh-title,.h-brand{color:#090909!important;background:none!important;-webkit-text-fill-color:#090909!important}
-button,.nav-btn,.play-green,.fap-play,.pdf-btn.primary{background:#111!important;color:#fff!important;border-color:#111!important;box-shadow:0 8px 20px rgba(0,0,0,.16)!important}
+button,.nav-btn,.play-green,.fap-play,.pdf-btn.primary{background:#121212!important;color:#fff!important;border-color:#121212!important;box-shadow:0 8px 20px rgba(18,18,18,.16)!important}
 .card,.post-card,.section-card,.owner-card,.media-slot,.audio-card,.fap,.mini-ap,.drawer,.modal-content{background:#fff!important;border-color:rgba(0,0,0,.12)!important;box-shadow:0 12px 28px rgba(0,0,0,.10)!important}
 input,textarea,select{background:#fafaf8!important;color:#111!important;border-color:rgba(0,0,0,.18)!important}
 .badge,.tag,.pill{background:#e8e8e4!important;color:#111!important}.api-pill{background:#fff!important;color:#444!important;border-color:rgba(0,0,0,.16)!important}
@@ -372,7 +375,7 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
 
 <!-- Splash -->
 <div id="splash">
-  <img class="splash-logo" src="/icons/archive.svg" alt="Archive">
+  <img class="splash-logo" src="/icons/archive-mark.png" alt="Archive">
   <div class="splash-brand">Archive</div>
   <div class="spinner"></div>
   <div class="splash-msg">جاري التحميل...</div>
@@ -383,7 +386,7 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
     <button class="icon-btn" id="btn-menu" aria-label="القائمة">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
-    <div class="brand-lockup"><img class="brand-logo" src="/icons/archive.svg" alt=""><div class="brand">Archive</div></div>
+    <div class="brand-lockup"><img class="brand-logo" src="/icons/archive-mark.png" alt=""><div class="brand">Archive</div></div>
     <button class="icon-btn" id="btn-refresh" aria-label="تحديث">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-15.5-6.3L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 15.5 6.3L21 16"/><path d="M21 21v-5h-5"/></svg>
     </button>
@@ -392,6 +395,7 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
   <main>
     <!-- Feed view -->
     <section class="view active" id="view-feed">
+      <div class="archive-home-hero"><img class="hero-mark" src="/icons/archive-mark.png" alt=""><div class="hero-copy"><span class="hero-kicker">ARCHIVE LIBRARY</span><h1 id="hero-title">مكتبتك في مكان واحد</h1><p id="hero-subtitle">استمع، شاهد، واقرأ المحتوى المحفوظ بسهولة.</p></div><div class="hero-count"><strong id="hero-count-value">—</strong>عنصر</div></div>
       <div class="search">
         <input type="search" id="search-input" placeholder="ابحث في المنشورات..." autocomplete="off"/>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -537,6 +541,7 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
 
 <script src="/api-config.js"></script>
 <script src="/firebase-direct.js"></script>
+<script src="/media-tools.js"></script>
 <script src="/native-audio-bridge.js"></script>
 <script>
 /* ============================================================
@@ -560,6 +565,7 @@ const FONT_PRESETS = {
 /* Detect well-known platforms and return an embeddable iframe URL.
    Returns '' if the URL is a regular direct media file. */
 function getEmbedSrc(url){
+  if (window.archiveMediaTools?.getEmbedSrc) return window.archiveMediaTools.getEmbedSrc(url);
   const raw = String(url || '').trim();
   if (!raw) return '';
   try {
@@ -661,6 +667,8 @@ function applyBranding(cfg={}){
   if (feedView) feedView.dataset.title = homeTitle;
   const splashMsg = document.querySelector('#splash .splash-msg');
   if (splashMsg) splashMsg.textContent = homeSubtitle || 'جاري التحميل...';
+  const heroTitle = $('#hero-title'); if (heroTitle) heroTitle.textContent = homeTitle || 'مكتبتك في مكان واحد';
+  const heroSubtitle = $('#hero-subtitle'); if (heroSubtitle) heroSubtitle.textContent = homeSubtitle || 'استمع، شاهد، واقرأ المحتوى المحفوظ بسهولة.';
 }
 
 function applyFont(cfg={}){
@@ -1178,6 +1186,7 @@ function renderFeed(){
     ? state.posts.filter(p => (p.title||'').toLowerCase().includes(q) || (p.body||'').toLowerCase().includes(q) || (p.tags||[]).some(t=>String(t).toLowerCase().includes(q)))
     : state.posts;
   feed.innerHTML = '';
+  const countEl = $('#hero-count-value'); if (countEl) countEl.textContent = fmtNum(state.posts.length);
   if (!q && Array.isArray(state.pinnedSecs) && state.pinnedSecs.length){
     const strip = document.createElement('div');
     strip.className = 'pinned-strip';
@@ -1716,31 +1725,11 @@ $('#search-input').addEventListener('input', e => { state.filter = e.target.valu
 /* ===== App-status (stop-app) check ===== */
 async function applyTheme(){
   try {
-    const cfg = await fetch(API+'/api/app-config').then(r=>r.json()).catch(()=>null);
+    const cfg = await apiCall('/api/app-config').catch(()=>null);
     applyBranding(cfg || {});
     applyFont(cfg || {});
     // Archive uses a deliberate monochrome visual system; remote theme colors are ignored.
     return;
-    const r = document.documentElement.style;
-    if (t.primary)     r.setProperty('--red', t.primary);
-    if (t.primary2)    r.setProperty('--red-2', t.primary2);
-    if (t.primaryDeep) r.setProperty('--red-deep', t.primaryDeep);
-    if (t.primary && t.primary2 && t.primaryDeep){
-      r.setProperty('--grad', `linear-gradient(135deg, ${t.primary} 0%, ${t.primary2} 50%, ${t.primaryDeep} 100%)`);
-    }
-    if (t.bg)      r.setProperty('--bg', t.bg);
-    if (t.surface) r.setProperty('--surface', t.surface);
-    if (t.text)    r.setProperty('--text', t.text);
-    if (t.audioColor && t.audioColor2){
-      // Recolour the green audio play button + full-screen audio player accents
-      const css = `
-        .play-green{background:linear-gradient(135deg, ${t.audioColor} 0%, ${t.audioColor2} 100%) !important}
-        #fap .fap-ctrls .fap-play{background:linear-gradient(135deg, ${t.audioColor}, ${t.audioColor2}) !important}
-        #fap .fap-prog-played{background:linear-gradient(90deg, ${t.audioColor}, ${t.audioColor2}) !important}
-      `;
-      let st = document.getElementById('theme-audio'); if (!st){ st = document.createElement('style'); st.id='theme-audio'; document.head.appendChild(st); }
-      st.textContent = css;
-    }
   } catch {}
 }
 

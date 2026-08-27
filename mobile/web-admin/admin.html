@@ -8,6 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="/icons/archive-192.png">
+<link rel="preload" as="image" href="/icons/archive-mark.png">
 <title>Archive — لوحة الإدارة</title>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;700;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
 <style>
@@ -164,14 +165,13 @@ textarea{resize:vertical;min-height:80px;line-height:1.6}
 
 
 /* Archive monochrome maintenance theme */
-:root{--bg:#f5f5f3!important;--surface:#ffffff!important;--surface-2:#eeeeeb!important;--surface-3:#deded9!important;--line:rgba(0,0,0,.10)!important;--line-2:rgba(0,0,0,.20)!important;--text:#0b0b0b!important;--muted:#5b5b59!important;--dim:#858581!important;--red:#111111!important;--red-2:#333333!important;--green:#111111!important;--amber:#333333!important;--grad:linear-gradient(135deg,#050505,#4a4a47)!important;--shadow:0 14px 34px rgba(0,0,0,.12)!important}
-html,body{background:var(--bg)!important;color:var(--text)!important}body::before{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(245,245,243,.72))!important}
-button,.btn,.tab.active{background:#111!important;color:#fff!important;border-color:#111!important;box-shadow:0 8px 20px rgba(0,0,0,.14)!important}.btn.danger{background:#e8e8e4!important;color:#111!important;border-color:#111!important}
-.card,.item,.chip,.stat,.drop,.modal .body{background:#fff!important;color:#111!important;border-color:rgba(0,0,0,.12)!important;box-shadow:0 12px 28px rgba(0,0,0,.10)!important}
+:root{--bg:#f6f2eb!important;--surface:#fffdf8!important;--surface-2:#f0ece4!important;--surface-3:#e5dfd5!important;--line:rgba(18,18,18,.10)!important;--line-2:rgba(18,18,18,.20)!important;--text:#121212!important;--muted:#62615d!important;--dim:#89857e!important;--red:#173c8f!important;--red-2:#255bc7!important;--green:#173c8f!important;--amber:#62502a!important;--grad:linear-gradient(135deg,#121212,#173c8f)!important;--shadow:0 14px 34px rgba(18,18,18,.12)!important}
+html,body{background:var(--bg)!important;color:var(--text)!important}body::before{background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(246,242,235,.78))!important}
+button,.btn,.tab.active{background:#121212!important;color:#fff!important;border-color:#121212!important;box-shadow:0 8px 20px rgba(18,18,18,.14)!important}.btn.danger{background:#e8e8e4!important;color:#111!important;border-color:#111!important}
+.card,.item,.chip,.stat,.drop,.modal .body{background:#fffdf8!important;color:#121212!important;border-color:rgba(18,18,18,.12)!important;box-shadow:0 12px 28px rgba(18,18,18,.10)!important}
 input,textarea,select{background:#fafaf8!important;color:#111!important;border-color:rgba(0,0,0,.18)!important}.api-pill{background:#fff!important;color:#444!important;border-color:rgba(0,0,0,.16)!important}
 .h-brand{background:none!important;color:#090909!important;-webkit-text-fill-color:#090909!important}.drop:hover,.drop.over{background:#f1f1ee!important;border-color:#111!important}
-</style>
-</head>
+.studio-hero{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:20px;border:1px solid var(--line-2);border-radius:22px;background:linear-gradient(135deg,#fff,#f0f0ec);box-shadow:0 16px 36px rgba(0,0,0,.10);margin-bottom:14px}.studio-mark{width:74px;height:74px;border-radius:20px;overflow:hidden;background:#111;display:grid;place-items:center}.studio-mark img{width:100%;height:100%;object-fit:cover}.studio-copy .eyebrow{font-size:10px;letter-spacing:.16em;color:#6b6b67;font-weight:900}.studio-copy h1{font-family:'Reem Kufi',sans-serif;font-size:25px;margin:3px 0}.studio-copy p{font-size:12px;color:var(--muted);line-height:1.7}.studio-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.quick{border:1px solid #111;background:#111;color:#fff;border-radius:999px;padding:9px 13px;font:700 12px inherit;cursor:pointer}.setup-note{margin:0 0 14px;padding:12px 14px;border:1px solid rgba(0,0,0,.16);border-radius:14px;background:#fff8e6;color:#3b300f;font-size:12px;line-height:1.7}.setup-note strong{font-weight:900}.icon-picker{display:flex;gap:6px;margin:-4px 0 10px}.icon-picker button{width:36px;height:32px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface-2);color:var(--text);font-size:16px;cursor:pointer}.icon-picker button:hover{background:#111;color:#fff}@media(max-width:700px){.studio-hero{grid-template-columns:auto 1fr}.studio-actions{grid-column:1/-1;justify-content:flex-start}.studio-mark{width:60px;height:60px;border-radius:16px}}\n</style>\n</head>
 <body>
 
 <div id="admin">
@@ -180,6 +180,13 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
     <div class="h-brand">Archive · الإدارة</div>
     <div class="api-pill">API: <span id="api-status" class="bad">●</span> <span id="api-url" style="direction:ltr"></span></div>
   </div>
+
+  <section class="studio-hero" aria-label="استوديو Archive">
+    <div class="studio-mark"><img src="/icons/archive-mark.png" alt=""></div>
+    <div class="studio-copy"><span class="eyebrow">ARCHIVE CONTENT STUDIO</span><h1>مركز المحتوى</h1><p>ارفع، رتّب، راجع ثم انشر. كل ملف أو رابط يبقى مرتبطًا بالمكان الذي اخترته.</p></div>
+    <div class="studio-actions"><button class="quick" data-go="posts">منشور جديد</button><button class="quick" data-go="sections">قسم جديد</button><button class="quick" data-go="menus">قائمة جديدة</button></div>
+  </section>
+  <div id="backend-banner" class="setup-note" hidden></div>
 
   <!-- Stats -->
   <div class="stats" id="stats"></div>
@@ -319,7 +326,8 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
       <p class="muted">القوائم الجانبية تظهر للمستخدم عبر زر ☰. كل قائمة تفتح صفحة مستقلة فيها الأقسام والمحتوى.</p>
       <label class="field"><span>اسم القائمة *</span><input type="text" id="m-label" maxlength="50" placeholder="مثل: القرآن الكريم، إذاعة البيان..."/></label>
       <div class="row">
-        <label class="field"><span>أيقونة (إيموجي)</span><input type="text" id="m-icon" maxlength="30" placeholder="📖"/></label>
+        <label class="field"><span>رمز القائمة</span><input type="text" id="m-icon" maxlength="30" placeholder="اختر رمزًا أو اكتب رمزًا"/></label>
+      <div class="icon-picker" aria-label="رموز مقترحة"><button type="button" data-icon="▣">▣</button><button type="button" data-icon="♫">♫</button><button type="button" data-icon="◈">◈</button><button type="button" data-icon="▤">▤</button><button type="button" data-icon="✦">✦</button><button type="button" data-icon="◉">◉</button></div>
         <label class="field"><span>الترتيب</span><input type="number" id="m-order" placeholder="0"/></label>
       </div>
       <label class="checkbox"><input type="checkbox" id="m-hidden"/> 🚫 إخفاء</label>
@@ -481,6 +489,7 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
 
 <script src="/api-config.js"></script>
 <script src="/firebase-direct.js"></script>
+<script src="/media-tools.js"></script>
 <script>
 /* ============================================================
    Archive — Admin Console
@@ -567,9 +576,11 @@ async function validateToken(token) {
 
 // Check token on load with retry
 (async () => {
+  const banner = $('#backend-banner');
   if (DIRECT_FIREBASE) {
     const s = $('#api-status');
     if (s) { s.className = 'ok'; s.textContent = '● Firebase مباشر — قراءة فقط'; }
+    if (banner) { banner.hidden = false; banner.innerHTML = '<strong>وضع العرض المباشر:</strong> المحتوى القديم ظاهر الآن من Firebase. الرفع والحفظ يحتاجان عنوان خدمة الإدارة الآمنة، لذلك لن تختفي الملفات أو تفشل العملية بصمت. <button class="btn tiny" type="button" id="connect-admin">ربط خدمة الإدارة</button>'; setTimeout(() => { const connect = $('#connect-admin'); if (connect) connect.addEventListener('click', () => { const value = prompt('ألصق عنوان HTTPS لخدمة Admin الآمنة'); if (!value) return; try { const u = new URL(value.trim()); if (u.protocol !== 'https:') throw new Error('HTTPS'); localStorage.setItem('archive_api_url', u.href.replace(/\/+$/, '')); location.reload(); } catch { toast('استخدم عنوان HTTPS صحيحًا لخدمة الإدارة', 'err'); } }); }, 0); }
     return;
   }
 
@@ -610,6 +621,7 @@ try {
   }
 
   // Token is valid, continue
+  if (banner) { banner.hidden = false; banner.style.background = '#eef8ef'; banner.style.color = '#173b1e'; banner.innerHTML = '<strong>وضع الإدارة الكامل:</strong> يمكن رفع الملفات وحفظ المنشورات والأقسام والقوائم.'; }
   const apiUrlEl = $('#api-url');
   if (apiUrlEl) apiUrlEl.textContent = API.replace(/^https?:\/\//,'');
   fetch(API+'/healthz').then(r=>r.json())
@@ -662,6 +674,12 @@ async function api(path, opts={}){
 }
 
 /* ===== Tabs ===== */
+function openAdminView(name){
+  const tab = document.querySelector(`.tab[data-view="${name}"]`);
+  if (tab) tab.click();
+}
+$$('.quick').forEach(btn => btn.addEventListener('click', () => openAdminView(btn.dataset.go)));
+$$('.icon-picker [data-icon]').forEach(btn => btn.addEventListener('click', () => { const input = $('#m-icon'); if (input) { input.value = btn.dataset.icon; input.dispatchEvent(new Event('input', { bubbles: true })); } }));
 $$('.tab').forEach(t => t.addEventListener('click', () => {
   $$('.tab').forEach(x=>x.classList.remove('active'));
   $$('.view').forEach(x=>x.classList.remove('active'));
@@ -676,6 +694,15 @@ $$('.tab').forEach(t => t.addEventListener('click', () => {
 }));
 
 /* ===== Stats ===== */
+function explainError(error, fallback='تعذر تنفيذ العملية'){
+  const code = String(error?.message || error || '');
+  if (code === 'ADMIN_BACKEND_REQUIRED') return 'النسخة الحالية متصلة بـ Firebase للقراءة فقط. لرفع أو حفظ التعديلات، اربط عنوان خدمة الإدارة الآمنة أولًا.';
+  if (/CLOUDINARY_NOT_CONFIGURED|501/.test(code)) return 'خدمة رفع الملفات غير مهيأة على الخادم. راجع إعدادات Cloudinary في بيئة الخادم.';
+  if (/401|403/.test(code)) return 'انتهت جلسة الإدارة أو لا تملك صلاحية الكتابة. سجّل الدخول من جديد.';
+  if (/BAD_MEDIA_URL|INVALID_MEDIA|400/.test(code)) return 'الرابط غير صالح أو غير مدعوم. استخدم رابط https كاملًا أو ارفع الملف من جهازك.';
+  if (/network|Failed to fetch/i.test(code)) return 'تعذر الاتصال بالخادم. تحقق من الإنترنت وعنوان خدمة الإدارة.';
+  return fallback + (code ? ` (${code})` : '');
+}
 async function loadStats(){
   try {
     const s = await api('/api/admin/stats');
@@ -710,6 +737,7 @@ function mimeForKind(kind, file){
 }
 
 async function uploadFile(file, onProgress){
+  if (DIRECT_FIREBASE) throw new Error('ADMIN_BACKEND_REQUIRED');
   const kind = detectKind(file);
   const resource_type = (kind === 'image') ? 'image'
                       : (kind === 'video' || kind === 'audio') ? 'video'
@@ -741,9 +769,13 @@ async function uploadFile(file, onProgress){
                     duration:j.duration||0, size:j.bytes||file.size,
                     mime:mimeForKind(kind, file), name:file.name });
         } catch { reject(new Error('invalid upload response')); }
-      } else reject(new Error('upload failed '+xhr.status));
+      } else {
+        let detail = '';
+        try { const body = JSON.parse(xhr.responseText); detail = body?.error?.message || body?.error || body?.message || ''; } catch {}
+        reject(new Error(`upload failed ${xhr.status}${detail ? `: ${detail}` : ''}`));
+      }
     };
-    xhr.onerror = () => reject(new Error('network'));
+    xhr.onerror = () => reject(new Error('network / CORS'));
     xhr.send(fd);
   });
 }
@@ -825,20 +857,24 @@ async function handleFiles(files){
       setTimeout(()=>row.remove(), 1500);
     } catch(e) {
       row.classList.add('err'); bar.style.width='100%';
-      toast('فشل رفع '+file.name, 'err');
+      row.title = explainError(e, 'فشل رفع الملف');
+      toast(explainError(e, 'فشل رفع الملف'), 'err');
     }
   }
 }
 
 $('#p-url-add').addEventListener('click', () => {
-  const url = $('#p-url').value.trim();
-  if (!url) return;
+  const raw = $('#p-url').value.trim();
+  const url = window.archiveMediaTools?.normalize(raw) || raw;
+  if (!url) return toast('ألصق رابط https صحيحًا', 'err');
   const t = $('#p-utype').value || detectByExt(url);
+  if (!['video','audio','image','pdf','embed','text'].includes(t)) return toast('تعذر تحديد نوع الرابط', 'err');
   mediaList.push({ type:t, url, caption:'' });
   $('#p-url').value=''; $('#p-utype').value=''; renderChips();
 });
 
 function detectByExt(u){
+  if (window.archiveMediaTools) return window.archiveMediaTools.detect(u);
   try {
     const url = new URL(u);
     const host = url.hostname.replace(/^www\./i,'').toLowerCase();
@@ -899,7 +935,7 @@ $('#p-save').addEventListener('click', async () => {
     else           await api('/api/admin/posts', { method:'POST', body:data });
     toast(editingId?'تم التحديث':'تم النشر', 'ok');
     resetForm(); loadPosts(); loadStats();
-  } catch(e) { toast('فشل الحفظ: '+e.message, 'err'); }
+  } catch(e){ toast(explainError(e, 'فشل حفظ المنشور'), 'err'); }
   finally { $('#p-save').disabled = false; }
 });
 
@@ -969,24 +1005,27 @@ function renderPostList(){
 }
 $('#posts-search').addEventListener('input', renderPostList);
 $('#posts-list').addEventListener('click', async e => {
-  const ed=e.target.closest('[data-edit]'),pi=e.target.closest('[data-pin]'),hi=e.target.closest('[data-hide]'),de=e.target.closest('[data-del]');
-  if (ed) {
-    const p = allPosts.find(x=>x.id===ed.dataset.edit); if (!p) return;
-    editingId = p.id; $('#post-form-title').textContent = 'تعديل: '+p.title;
-    $('#p-title').value = p.title||''; $('#p-body').value=p.body||''; $('#p-cover').value=p.coverUrl||'';
-    $('#p-cat').value=p.category||''; $('#p-tags').value=(p.tags||[]).join(', ');
-    $('#p-pinned').checked=!!p.pinned; $('#p-featured').checked=!!p.featured; $('#p-hidden').checked=!!p.hidden; $('#p-draft').checked=!!p.draft;
-    if ($('#p-section')) $('#p-section').value = p.sectionId || '';
-    mediaList.length=0; (p.media||[]).forEach(m=>mediaList.push({...m})); renderChips();
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-  if (pi) { const p=allPosts.find(x=>x.id===pi.dataset.pin); await api('/api/admin/posts/'+encodeURIComponent(p.id),{method:'PUT',body:{pinned:!p.pinned}}); loadPosts(); toast('تم'); }
-  if (hi) { const p=allPosts.find(x=>x.id===hi.dataset.hide); await api('/api/admin/posts/'+encodeURIComponent(p.id),{method:'PUT',body:{hidden:!p.hidden}}); loadPosts(); toast('تم'); }
-  if (de) {
-    if (!confirm('حذف هذا المنشور؟')) return;
-    await api('/api/admin/posts/'+encodeURIComponent(de.dataset.del),{method:'DELETE'});
-    loadPosts(); loadStats(); toast('تم الحذف','ok');
-  }
+  try {
+    const ed=e.target.closest('[data-edit]'),pi=e.target.closest('[data-pin]'),hi=e.target.closest('[data-hide]'),de=e.target.closest('[data-del]');
+    if (ed) {
+      const p = allPosts.find(x=>x.id===ed.dataset.edit); if (!p) return;
+      editingId = p.id; $('#post-form-title').textContent = 'تعديل: '+p.title;
+      $('#p-title').value = p.title||''; $('#p-body').value=p.body||''; $('#p-cover').value=p.coverUrl||'';
+      $('#p-cat').value=p.category||''; $('#p-tags').value=(p.tags||[]).join(', ');
+      $('#p-pinned').checked=!!p.pinned; $('#p-featured').checked=!!p.featured; $('#p-hidden').checked=!!p.hidden; $('#p-draft').checked=!!p.draft;
+      if ($('#p-section')) $('#p-section').value = p.sectionId || '';
+      mediaList.length=0; (p.media||[]).forEach(m=>mediaList.push({...m})); renderChips();
+      window.scrollTo({top:0, behavior:'smooth'});
+      return;
+    }
+    if (pi) { const p=allPosts.find(x=>x.id===pi.dataset.pin); await api('/api/admin/posts/'+encodeURIComponent(p.id),{method:'PUT',body:{pinned:!p.pinned}}); loadPosts(); toast('تم','ok'); }
+    if (hi) { const p=allPosts.find(x=>x.id===hi.dataset.hide); await api('/api/admin/posts/'+encodeURIComponent(p.id),{method:'PUT',body:{hidden:!p.hidden}}); loadPosts(); toast('تم','ok'); }
+    if (de) {
+      if (!confirm('حذف هذا المنشور؟')) return;
+      await api('/api/admin/posts/'+encodeURIComponent(de.dataset.del),{method:'DELETE'});
+      loadPosts(); loadStats(); toast('تم الحذف','ok');
+    }
+  } catch (error) { toast(explainError(error, 'تعذر تنفيذ الإجراء'), 'err'); }
 });
 
 function renderMediaLib(){
@@ -1045,12 +1084,13 @@ async function sHandleFiles(files){
     try{ const res=await uploadFile(file,p=>bar.style.width=p+'%');
       sMediaList.push({type:res.kind,url:res.url,caption:'',width:res.width,height:res.height,duration:res.duration,size:res.size,mime:res.mime});
       bar.style.width='100%';row.classList.add('done');renderSChips();setTimeout(()=>row.remove(),1500);
-    }catch{row.classList.add('err');toast('فشل رفع '+file.name,'err');}
+    }catch(e){row.classList.add('err');row.title=explainError(e,'فشل رفع الملف');toast(explainError(e,'فشل رفع الملف'),'err');}
   }
 }
 
 $('#s-url-add')?.addEventListener('click',()=>{
-  const u=$('#s-url').value.trim(); if(!u) return;
+  const raw=$('#s-url').value.trim(); const u=window.archiveMediaTools?.normalize(raw)||raw;
+  if(!u) return toast('ألصق رابط https صحيحًا','err');
   sMediaList.push({type:$('#s-utype').value||detectByExt(u),url:u,caption:''});
   $('#s-url').value='';$('#s-utype').value='';renderSChips();
 });
@@ -1095,7 +1135,8 @@ async function aHandleFiles(files){
     toast('تم رفع الملف وملء الرابط', 'ok');
   } catch (e) {
     row.classList.add('err');
-    toast('فشل رفع الملف: ' + (e.message || ''), 'err');
+    row.title = explainError(e, 'فشل رفع الملف');
+    toast(explainError(e, 'فشل رفع الملف'), 'err');
   }
 }
 
@@ -1111,7 +1152,7 @@ $('#s-save').addEventListener('click', async () => {
     if (editSecId) await api('/api/admin/sections/'+encodeURIComponent(editSecId),{method:'PUT',body});
     else            await api('/api/admin/sections',{method:'POST',body});
     resetSecForm(); loadSections(); toast('تم','ok');
-  } catch(e){ toast('فشل: '+e.message,'err'); }
+  } catch(e){ toast(explainError(e, 'فشل حفظ القسم'),'err'); }
 });
 
 async function refreshMenuSelect(){
@@ -1161,16 +1202,16 @@ async function loadSections(){
 }
 
 let editMenuId=null;
-function resetMenuForm(){ editMenuId=null; ['m-label','m-icon','m-order'].forEach(id=>$('#'+id).value=''); $('#m-hidden').checked=false; $('#menu-form-title').textContent='قائمة جانبية جديدة'; }
+function resetMenuForm(){ editMenuId=null; ['m-label','m-icon','m-order','m-desc'].forEach(id=>{const el=$('#'+id);if(el)el.value='';}); $('#m-hidden').checked=false; mnMediaList.length=0; renderMnChips(); $('#menu-form-title').textContent='قائمة جانبية جديدة'; }
 $('#m-reset')?.addEventListener('click', resetMenuForm);
 $('#m-save')?.addEventListener('click', async ()=>{
-  const body={ label:$('#m-label').value.trim(), icon:$('#m-icon').value.trim(), order:Number($('#m-order').value)||0, hidden:$('#m-hidden').checked };
+  const body={ label:$('#m-label').value.trim(), icon:$('#m-icon').value.trim(), order:Number($('#m-order').value)||0, hidden:$('#m-hidden').checked, description:$('#m-desc')?.value||'', media:mnMediaList.slice() };
   if(!body.label) return toast('الاسم مطلوب','err');
   try{
     if(editMenuId) await api('/api/admin/side-menu/'+encodeURIComponent(editMenuId),{method:'PUT',body});
     else           await api('/api/admin/side-menu',{method:'POST',body});
     resetMenuForm(); loadMenus(); toast('تم','ok');
-  }catch(e){ toast('فشل: '+e.message,'err'); }
+  }catch(e){ toast(explainError(e, 'فشل حفظ القائمة'),'err'); }
 });
 
 async function loadMenus(){
@@ -1187,7 +1228,7 @@ async function loadMenus(){
         </div></div>`).join('') || '<p class="muted" style="text-align:center;padding:20px">لا توجد قوائم بعد</p>';
     $('#menus-list').onclick = async e=>{
       const ed=e.target.closest('[data-mn-ed]'), hi=e.target.closest('[data-mn-hide]'), de=e.target.closest('[data-mn-del]');
-      if(ed){ const m=items.find(x=>x.id===ed.dataset.mnEd); editMenuId=m.id; $('#m-label').value=m.label||''; $('#m-icon').value=m.icon||''; $('#m-order').value=m.order||0; $('#m-hidden').checked=!!m.hidden; $('#menu-form-title').textContent='تعديل: '+m.label; window.scrollTo({top:0,behavior:'smooth'}); }
+      if(ed){ const m=items.find(x=>x.id===ed.dataset.mnEd); editMenuId=m.id; $('#m-label').value=m.label||''; $('#m-icon').value=m.icon||''; $('#m-order').value=m.order||0; $('#m-desc').value=m.description||''; $('#m-hidden').checked=!!m.hidden; mnMediaList.length=0; (m.media||[]).forEach(x=>mnMediaList.push({...x})); renderMnChips(); $('#menu-form-title').textContent='تعديل: '+m.label; window.scrollTo({top:0,behavior:'smooth'}); }
       if(hi){ const m=items.find(x=>x.id===hi.dataset.mnHide); await api('/api/admin/side-menu/'+encodeURIComponent(m.id),{method:'PUT',body:{hidden:!m.hidden}}); loadMenus(); }
       if(de){ if(!confirm('حذف هذه القائمة؟')) return; await api('/api/admin/side-menu/'+encodeURIComponent(de.dataset.mnDel),{method:'DELETE'}); loadMenus(); toast('تم الحذف','ok'); }
     };
@@ -1196,9 +1237,10 @@ async function loadMenus(){
 
 let editAnId = null;
 $('#a-save').addEventListener('click', async () => {
-  const cover = $('#a-cover').value.trim();
-  const url = $('#a-url').value.trim();
-  const type = ($('#a-type') && $('#a-type').value) || 'audio';
+  const cover = window.archiveMediaTools?.normalize($('#a-cover').value.trim()) || $('#a-cover').value.trim();
+  const url = window.archiveMediaTools?.normalize($('#a-url').value.trim()) || $('#a-url').value.trim();
+  const selectedType = ($('#a-type') && $('#a-type').value) || '';
+  const type = window.archiveMediaTools?.detect(url, selectedType) || selectedType || 'audio';
   const body = {
     title:$('#a-title').value.trim(),
     artist:$('#a-artist').value.trim(),
@@ -1217,7 +1259,7 @@ $('#a-save').addEventListener('click', async () => {
     }
     editAnId=null; ['a-title','a-artist','a-url','a-cover'].forEach(id=>$('#'+id).value=''); if ($('#a-type')) $('#a-type').value='audio'; $('#a-section').value=''; $('#a-bcast').checked=false;
     loadAnasheed(); toast('تم','ok');
-  } catch{ toast('فشل','err'); }
+  } catch(e){ toast(explainError(e, 'فشل حفظ الأنشودة'),'err'); }
 });
 
 $('#a-bcast-now').addEventListener('click', async () => {
@@ -1225,7 +1267,7 @@ $('#a-bcast-now').addEventListener('click', async () => {
   if (!cover) return toast('ضع رابط صورة في حقل الغلاف أولاً','err');
   if (!confirm('سيتم استبدال صورة الغلاف في كل الأناشيد. متابعة؟')) return;
   try { const r=await api('/api/admin/anasheed/broadcast-cover',{method:'POST',body:{coverUrl:cover}}); toast('تم تحديث '+(r.updated||0)+' نشيد','ok'); loadAnasheed(); }
-  catch{ toast('فشل','err'); }
+  catch(e){ toast(explainError(e, 'فشل تطبيق الغلاف'),'err'); }
 });
 
 $('#a-bcast-sec')?.addEventListener('click', async () => {
@@ -1238,7 +1280,7 @@ $('#a-bcast-sec')?.addEventListener('click', async () => {
     const r = await api('/api/admin/anasheed/broadcast-cover', { method:'POST', body:{ coverUrl:cover, sectionId } });
     toast(`تم: ${r.updated||0} نشيد + ${r.mediaUpdated||0} عنصر داخل القسم`, 'ok');
     loadAnasheed(); loadSections();
-  } catch { toast('فشل','err'); }
+  } catch(e){ toast(explainError(e, 'فشل تطبيق الغلاف'),'err'); }
 });
 
 async function loadAnasheed(){
@@ -1392,11 +1434,12 @@ async function mnHandleFiles(files){
     try{ const res=await uploadFile(file,p=>bar.style.width=p+'%');
       mnMediaList.push({type:res.kind,url:res.url,caption:'',width:res.width||0,height:res.height||0,duration:res.duration||0,size:res.size,mime:res.mime});
       bar.style.width='100%';row.classList.add('done');renderMnChips();setTimeout(()=>row.remove(),1500);
-    }catch{row.classList.add('err');toast('فشل رفع '+file.name,'err');}
+    }catch(e){row.classList.add('err');row.title=explainError(e,'فشل رفع الملف');toast(explainError(e,'فشل رفع الملف'),'err');}
   }
 }
 $('#mn-url-add')?.addEventListener('click',()=>{
-  const u=$('#mn-url').value.trim(); if(!u) return;
+  const raw=$('#mn-url').value.trim(); const u=window.archiveMediaTools?.normalize(raw)||raw;
+  if(!u) return toast('ألصق رابط https صحيحًا','err');
   mnMediaList.push({type:$('#mn-utype').value||detectByExt(u),url:u,caption:''});
   $('#mn-url').value='';$('#mn-utype').value='';renderMnChips();
 });
