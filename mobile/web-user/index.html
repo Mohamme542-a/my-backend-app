@@ -536,6 +536,7 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
 </div>
 
 <script src="/api-config.js"></script>
+<script src="/firebase-direct.js"></script>
 <script src="/native-audio-bridge.js"></script>
 <script>
 /* ============================================================
@@ -624,6 +625,9 @@ function normalizeMediaUrl(url, meta={}){
   if (/^blob:/i.test(src)) return src;
   if (src.startsWith(API + '/api/stream')) return src;
   const type = String(meta.type || '').trim();
+  // Public media may be opened directly from Firebase/Archive.org in the APK;
+  // server proxy remains available for the regular web app and private sources.
+  if (window.archiveDirectFirebase?.enabled && /^https?:\/\//i.test(src) && ['audio','video','image','pdf'].includes(type)) return src;
   // Embeds (YouTube, Vimeo, archive.org details, ...) must NOT be proxied.
   if (type === 'embed' || getEmbedSrc(src)) return src;
   const mime = String(meta.mime || '').trim();
@@ -702,6 +706,10 @@ const store = {
 /* ===== Simple API (no auth, no signing) ===== */
 async function apiCall(path, opts){
   const method = (opts && opts.method) || 'GET';
+  if (method === 'GET' && window.archiveDirectFirebase?.enabled) {
+    const direct = await window.archiveDirectFirebase.api(path);
+    if (direct !== null) return direct;
+  }
   const body = opts && opts.body ? (typeof opts.body==='string'?opts.body:JSON.stringify(opts.body)) : undefined;
   const headers = {};
   if (method!=='GET' && body) headers['content-type']='application/json';

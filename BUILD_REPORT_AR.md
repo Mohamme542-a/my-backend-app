@@ -52,3 +52,11 @@
 أضيف Native Audio لنسخة User مع خدمة Android أمامية وإشعار تشغيل، وطلب صلاحية الإشعارات على Android 13+، وصلاحيات `FOREGROUND_SERVICE` و`FOREGROUND_SERVICE_MEDIA_PLAYBACK` و`WAKE_LOCK`. أضيف Browser لفتح الروابط الخارجية من Android. لا تحتاج نسخة Admin إلى أذونات الصوت أو الإشعارات.
 
 التحقق الأخير: نجح فحص JavaScript المضمّن، و`npm test`، ومزامنة Capacitor، وبناء User وAdmin عبر Gradle، وتوقيع APK. يحتوي User على أذونات الإنترنت والتشغيل الخلفي والإشعار فقط، بينما يحتوي Admin على الإنترنت فقط. لم يتم اختبار الإشعار على جهاز Android فعلي لعدم وجود جهاز متصل ببيئة البناء؛ يحتاج التحقق النهائي على الهاتف إلى تشغيل أنشودة ثم إغلاق التطبيق والتأكد من ظهور إشعار Archive.
+
+## وضع Firebase المباشر بدون Render
+
+في آخر بناء، حُقن `FIREBASE_DB_URL` العام فقط داخل User وAdmin، وأصبح User يقرأ المنشورات والأقسام والقائمة والأناشيد والإعدادات مباشرة من Realtime Database دون عنوان Render. كما يستطيع Admin قراءة الإحصاءات والمواد القديمة مباشرة ويفتح دون شاشة دخول في هذا الوضع.
+
+عمليات Admin التي تغيّر البيانات أو ترفع ملفات بقيت مرفوضة في وضع الاتصال المباشر read-only؛ لا يجوز وضع `FIREBASE_DB_SECRET` أو Firebase Admin SDK داخل APK، لأن ذلك يمنح كل من يستخرج التطبيق صلاحيات حذف وتعديل كاملة. لتفعيل الكتابة مع إزالة Render، يلزم نشر API محمي كـ Firebase Functions أو خدمة Backend بديلة، ثم تمرير عنوانها في `CAPACITOR_ADMIN_API_URL` عند بناء Admin فقط.
+
+نتائج البناء المباشر: User وAdmin بدون `onrender.com` داخل إعدادات APK، ونجح توقيع Debug. يحتوي User على اتصال Firebase العام، بينما لا يحتوي Admin على أي secret.

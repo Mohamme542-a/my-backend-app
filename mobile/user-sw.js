@@ -2,7 +2,7 @@
 const VERSION = 'archive-user-v2-maintenance';
 const STATIC = `${VERSION}-static`;
 const RUNTIME = `${VERSION}-runtime`;
-const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/api-config.js', '/native-audio-bridge.js', '/external-links.js', '/icons/archive.svg', '/icons/archive-192.png', '/icons/archive-512.png'];
+const PRECACHE = ['/', '/index.html', '/manifest.webmanifest', '/api-config.js', '/firebase-direct.js', '/native-audio-bridge.js', '/external-links.js', '/icons/archive.svg', '/icons/archive-192.png', '/icons/archive-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(STATIC).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting()));

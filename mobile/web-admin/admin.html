@@ -480,11 +480,14 @@ input,textarea,select{background:#fafaf8!important;color:#111!important;border-c
 <div id="toast"></div>
 
 <script src="/api-config.js"></script>
+<script src="/firebase-direct.js"></script>
 <script>
 /* ============================================================
    Archive — Admin Console
    ============================================================ */
- const API = (window.__API__ || location.origin).replace(/\/+$/,'');
+ const CONFIGURED_API = String(window.__API__ || '').trim().replace(/\/+$/,'');
+ const API = (CONFIGURED_API || location.origin).replace(/\/+$/,'');
+ const DIRECT_FIREBASE = !!window.archiveDirectFirebase?.enabled && !CONFIGURED_API;
 
 const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -564,6 +567,12 @@ async function validateToken(token) {
 
 // Check token on load with retry
 (async () => {
+  if (DIRECT_FIREBASE) {
+    const s = $('#api-status');
+    if (s) { s.className = 'ok'; s.textContent = '● Firebase مباشر — قراءة فقط'; }
+    return;
+  }
+
   await bootstrapCsrf();
 
   // Small delay to ensure localStorage is ready
@@ -611,6 +620,11 @@ try {
 /* ===== API wrapper with automatic token handling ===== */
 async function api(path, opts={}){
   const method = opts.method || 'GET';
+  if (DIRECT_FIREBASE && method !== 'GET' && method !== 'HEAD') throw new Error('ADMIN_BACKEND_REQUIRED');
+  if (method === 'GET' && window.archiveDirectFirebase?.enabled) {
+    const direct = await window.archiveDirectFirebase.api(path);
+    if (direct !== null) return direct;
+  }
   const headers = {};
   if (opts.body) headers['content-type'] = 'application/json';
   let token = getAccess();
